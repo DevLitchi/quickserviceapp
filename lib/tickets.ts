@@ -178,11 +178,12 @@ export async function assignTicket(ticketId: string, engineerName: string, engin
   }
 }
 
-// Resolver un ticket y actualizar experiencia y nivel
+// Update the resolveTicket function signature to accept evidence
 export async function resolveTicket(
   ticketId: string,
   resolutionDetails: string,
   supportedBy?: string,
+  evidence?: { url: string; filename: string; contentType: string; description?: string }[],
 ): Promise<boolean> {
   try {
     const ticketsCollection = await getCollection("tickets")
@@ -250,6 +251,22 @@ Tiempo para resolver: ${elapsedTimeFormatted}`
       resolvedAt: now,
       expAwarded,
       elapsedTime: elapsedTime, // Guardar el tiempo transcurrido en milisegundos
+      verificationStatus: "pending", // New field for verification status
+    }
+
+    // Process evidence if provided
+    if (evidence && evidence.length > 0) {
+      const ticketEvidence = evidence.map((item, index) => ({
+        id: index + 1,
+        url: item.url,
+        filename: item.filename,
+        contentType: item.contentType,
+        uploadedBy: userName || "Usuario",
+        uploadedAt: now.getTime(),
+        description: item.description || "",
+      }))
+
+      updateData.evidence = ticketEvidence
     }
 
     // Añadir el campo supportedBy si se proporciona
@@ -279,10 +296,20 @@ Tiempo para resolver: ${elapsedTimeFormatted}`
       },
     ]
 
+    // Add evidence entry to changelog if provided
+    if (evidence && evidence.length > 0) {
+      changelogEntries.push({
+        id: nextChangelogId + 3,
+        action: `Evidencia adjuntada: ${evidence.length} archivo(s)`,
+        timestamp: now.getTime(),
+        user: userName || "Usuario",
+      })
+    }
+
     // Añadir entrada de soporte si existe
     if (supportedBy) {
       changelogEntries.push({
-        id: nextChangelogId + 3,
+        id: nextChangelogId + (evidence && evidence.length > 0 ? 4 : 3),
         action: `Con soporte de: ${supportedBy}`,
         timestamp: now.getTime(),
         user: userName || "Usuario",
@@ -322,7 +349,7 @@ Tiempo para resolver: ${elapsedTimeFormatted}`
             {
               $push: {
                 changelog: {
-                  id: nextChangelogId + 4,
+                  id: nextChangelogId + (evidence && evidence.length > 0 ? 5 : 4),
                   action: `¡${userName || "Usuario"} ha subido al nivel ${xpResult.newLevel}!`,
                   timestamp: now.getTime(),
                   user: "Sistema",
@@ -356,7 +383,7 @@ Tiempo para resolver: ${elapsedTimeFormatted}`
               {
                 $push: {
                   changelog: {
-                    id: nextChangelogId + 5,
+                    id: nextChangelogId + (evidence && evidence.length > 0 ? 6 : 5),
                     action: `¡${supportedBy} ha subido al nivel ${supportXpResult.newLevel}!`,
                     timestamp: now.getTime(),
                     user: "Sistema",
@@ -372,6 +399,92 @@ Tiempo para resolver: ${elapsedTimeFormatted}`
     return result.modifiedCount > 0
   } catch (error) {
     DebugLogger.error("resolveTicket", `Error resolving ticket ${ticketId}`, error)
+    return false
+  }
+}
+
+// Add new function for verifying ticket resolution
+export async function verifyTicketResolution(
+  ticketId: string,
+  isApproved: boolean,
+  verificationNotes?: string,
+): Promise<boolean> {
+  try {
+    const ticketsCollection = await getCollection("tickets")
+    const userName = await getUserName()
+    const userRole = await getUserRole()
+
+    // Check permissions - only admin, gerente, or supervisor can verify
+    if (userRole !== "admin" && userRole !== "gerente" && userRole !== "supervisor") {
+      throw new Error("No tiene permisos para verificar tickets")
+    }
+
+    let id
+    try {
+      id = toObjectId(ticketId)
+    } catch (error) {
+      const ticket = await ticketsCollection.findOne({ id: Number.parseInt(ticketId) })
+      if (ticket) {
+        id = ticket._id
+      } else {
+        throw new Error("Ticket no encontrado")
+      }
+    }
+
+    const now = new Date()
+
+    // Get current ticket
+    const currentTicket = await ticketsCollection.findOne({ _id: id })
+    if (!currentTicket) {
+      throw new Error("Ticket no encontrado")
+    }
+
+    const nextChangelogId = currentTicket.changelog ? currentTicket.changelog.length + 1 : 1
+
+    // Update verification status
+    const updateData: any = {
+      verificationStatus: isApproved ? "approved" : "rejected",
+      verifiedBy: userName,
+      verifiedAt: now.getTime(),
+    }
+
+    if (verificationNotes) {
+      updateData.verificationNotes = verificationNotes
+    }
+
+    // If rejected, reopen the ticket
+    if (!isApproved) {
+      updateData.resolved = false
+      updateData.pendingUserConfirmation = false
+      updateData.estado = "Abierto"
+    }
+
+    // Create changelog entry
+    const action = isApproved
+      ? "Verificación aprobada: La resolución del ticket ha sido verificada y aprobada"
+      : "Verificación rechazada: La resolución del ticket ha sido rechazada"
+
+    const changelogEntry = {
+      id: nextChangelogId,
+      action: verificationNotes ? `${action}. Notas: ${verificationNotes}` : action,
+      timestamp: now.getTime(),
+      user: userName || "Verificador",
+    }
+
+    // Update the ticket
+    const result = await ticketsCollection.updateOne(
+      { _id: id },
+      {
+        $set: updateData,
+        $push: {
+          changelog: changelogEntry,
+        },
+      },
+    )
+
+    return result.modifiedCount > 0
+  } catch (error) {
+    DebugLogger.error("verifyTicketResolution", `Error verifying ticket ${ticketId}`, error)
     return false
   }
 }

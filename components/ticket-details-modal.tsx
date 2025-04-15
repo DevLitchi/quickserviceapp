@@ -13,7 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle, Loader2, Clock } from "lucide-react"
 import { ElapsedTimeCounter } from "@/components/elapsed-time-counter"
 import type { Ticket, TicketComment, User } from "@/lib/types"
+import EvidenceUploader from "@/components/evidence-uploader"
 
+// Update the TicketDetailsModalProps interface to include new props
 interface TicketDetailsModalProps {
   ticket: Ticket
   isOpen: boolean
@@ -21,7 +23,8 @@ interface TicketDetailsModalProps {
   onCloseTicket: (ticketId: number, changelogEntry: string) => void
   onAssignTicket?: (ticketId: number) => void
   onAddComment?: (ticketId: number, comment: string) => void
-  onMarkAsResolved?: (ticketId: number, resolutionDetails: string, supportedBy?: string) => void
+  onMarkAsResolved?: (ticketId: number, resolutionDetails: string, supportedBy?: string, evidence?: any[]) => void
+  onVerifyResolution?: (ticketId: number, isApproved: boolean, verificationNotes?: string) => void
   userRole?: string | null
   currentUser?: any
   showFixturaField?: boolean
@@ -35,10 +38,22 @@ export default function TicketDetailsModal({
   onAssignTicket,
   onAddComment,
   onMarkAsResolved,
+  onVerifyResolution,
   userRole,
   currentUser,
   showFixturaField = false,
 }: TicketDetailsModalProps) {
+  // Add these new state variables inside the component function
+  const [evidenceFiles, setEvidenceFiles] = useState<
+    Array<{
+      url: string
+      filename: string
+      contentType: string
+      description?: string
+    }>
+  >([])
+  const [verificationNotes, setVerificationNotes] = useState("")
+  const [isVerifying, setIsVerifying] = useState(false)
   const [activeTab, setActiveTab] = useState("report")
   const [changelogEntry, setChangelogEntry] = useState("")
   const [commentText, setCommentText] = useState("")
@@ -101,6 +116,13 @@ export default function TicketDetailsModal({
 
   const canCloseTicket = userRole === "admin" || userRole === "gerente"
 
+  // Add this function to check if user can verify tickets
+  const canVerifyTicket =
+    (userRole === "admin" || userRole === "gerente" || userRole === "supervisor") &&
+    ticket.resolved &&
+    ticket.verificationStatus === "pending" &&
+    onVerifyResolution !== undefined
+
   const handleCloseTicket = async () => {
     if (!changelogEntry.trim()) {
       alert("Por favor añada una entrada de changelog antes de cerrar el ticket")
@@ -140,6 +162,17 @@ export default function TicketDetailsModal({
     }
   }
 
+  // Add this function inside the component function
+  const handleEvidenceUpload = (evidence: {
+    url: string
+    filename: string
+    contentType: string
+    description?: string
+  }) => {
+    setEvidenceFiles([...evidenceFiles, evidence])
+  }
+
+  // Update the handleMarkAsResolved function to include evidence
   const handleMarkAsResolved = async () => {
     if (!resolutionDetails.trim() || !onMarkAsResolved || !canResolveTicket) {
       alert("Por favor proporcione detalles de la resolución")
@@ -166,10 +199,24 @@ ${finalResolutionDetails}`
 Soporte de: ${supportedBy}`
       }
 
-      await onMarkAsResolved(ticket.id, finalResolutionDetails, supportedBy)
+      // Pass evidence files to the resolution function
+      await onMarkAsResolved(ticket.id, finalResolutionDetails, supportedBy, evidenceFiles)
     } finally {
       setIsResolving(false)
       setActiveTab("report")
+    }
+  }
+
+  // Add this new function inside the component function
+  const handleVerifyResolution = async (isApproved: boolean) => {
+    if (!onVerifyResolution) return
+
+    setIsVerifying(true)
+    try {
+      await onVerifyResolution(ticket.id, isApproved, verificationNotes)
+      onClose()
+    } finally {
+      setIsVerifying(false)
     }
   }
 
@@ -294,6 +341,46 @@ Soporte de: ${supportedBy}`
               </div>
             )}
 
+            {ticket.resolved && ticket.verificationStatus && (
+              <div
+                className="mt-2 p-2 rounded-md"
+                className={
+                  ticket.verificationStatus === "approved"
+                    ? "bg-green-50"
+                    : ticket.verificationStatus === "rejected"
+                      ? "bg-red-50"
+                      : "bg-yellow-50"
+                }
+              >
+                <Label
+                  className={`text-sm font-medium ${
+                    ticket.verificationStatus === "approved"
+                      ? "text-green-700"
+                      : ticket.verificationStatus === "rejected"
+                        ? "text-red-700"
+                        : "text-yellow-700"
+                  }`}
+                >
+                  Estado de Verificación:{" "}
+                  {ticket.verificationStatus === "approved"
+                    ? "Aprobado"
+                    : ticket.verificationStatus === "rejected"
+                      ? "Rechazado"
+                      : "Pendiente"}
+                </Label>
+
+                {ticket.verifiedBy && (
+                  <p className="text-sm mt-1">
+                    Verificado por: {ticket.verifiedBy} el {new Date(ticket.verifiedAt || Date.now()).toLocaleString()}
+                  </p>
+                )}
+
+                {ticket.verificationNotes && (
+                  <p className="text-sm mt-1 whitespace-pre-line">Notas: {ticket.verificationNotes}</p>
+                )}
+              </div>
+            )}
+
             {ticket.img && (
               <div className="mt-4">
                 <Label className="text-sm font-medium">Imagen</Label>
@@ -302,6 +389,30 @@ Soporte de: ${supportedBy}`
                   alt="Adjunto del ticket"
                   className="mt-1 max-h-[200px] rounded-md"
                 />
+              </div>
+            )}
+
+            {ticket.evidence && ticket.evidence.length > 0 && (
+              <div className="mt-4 border-t pt-4">
+                <Label className="text-sm font-medium">Evidencia de Resolución</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                  {ticket.evidence.map((item, index) => (
+                    <div key={index} className="border rounded-md p-2 bg-gray-50">
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-sm font-medium"
+                      >
+                        {item.filename}
+                      </a>
+                      {item.description && <p className="text-xs text-gray-500 mt-1">{item.description}</p>}
+                      <p className="text-xs text-gray-400 mt-1">
+                        Subido por {item.uploadedBy} el {new Date(item.uploadedAt).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </TabsContent>
@@ -401,6 +512,13 @@ Soporte de: ${supportedBy}`
                   </div>
                 )}
 
+                {!ticket.resolved && canResolveTicket && (
+                  <div className="mb-4">
+                    <h4 className="font-medium mb-2">Evidencia de Resolución</h4>
+                    <EvidenceUploader ticketId={ticket.id} onUploadComplete={handleEvidenceUpload} maxFiles={5} />
+                  </div>
+                )}
+
                 <div>
                   <Label htmlFor="resolution-details">Detalles de Resolución</Label>
                   <Textarea
@@ -416,6 +534,8 @@ Soporte de: ${supportedBy}`
                     <p className="text-xs text-orange-500 mt-1">No tiene permisos para resolver este ticket.</p>
                   )}
                 </div>
+
+                <EvidenceUploader onEvidenceUpload={handleEvidenceUpload} />
 
                 {canResolveTicket && (
                   <Button
@@ -467,6 +587,59 @@ Soporte de: ${supportedBy}`
                   )}
                 </div>
 
+                {ticket.resolved && ticket.verificationStatus === "pending" && canVerifyTicket && (
+                  <div className="mt-4 border-t pt-4">
+                    <h4 className="font-medium mb-2">Verificación de Resolución</h4>
+                    <div className="space-y-4">
+                      <div className="p-3 bg-yellow-50 rounded-md">
+                        <p className="text-sm text-yellow-800">
+                          Este ticket está pendiente de verificación. Por favor revise la resolución y la evidencia
+                          proporcionada.
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="verification-notes">Notas de Verificación</Label>
+                        <Textarea
+                          id="verification-notes"
+                          placeholder="Añada notas sobre la verificación (requerido para rechazar)"
+                          value={verificationNotes}
+                          onChange={(e) => setVerificationNotes(e.target.value)}
+                          className="mt-1"
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleVerifyResolution(false)}
+                          disabled={isVerifying || !verificationNotes.trim()}
+                        >
+                          {isVerifying ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Procesando...
+                            </>
+                          ) : (
+                            "Rechazar Resolución"
+                          )}
+                        </Button>
+                        <Button variant="default" onClick={() => handleVerifyResolution(true)} disabled={isVerifying}>
+                          {isVerifying ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Procesando...
+                            </>
+                          ) : (
+                            "Aprobar Resolución"
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="border-t pt-4">
                   <h4 className="font-medium mb-2">Historial de Cambios</h4>
                   {ticket.changelog && ticket.changelog.length > 0 ? (
@@ -495,18 +668,40 @@ Soporte de: ${supportedBy}`
             Cerrar
           </Button>
 
-          {canCloseTicket && !ticket.resolved && (
+          {canVerifyTicket ? (
             <div className="flex items-center space-x-2">
               <Textarea
-                placeholder="Razón para cerrar el ticket"
-                value={changelogEntry}
-                onChange={(e) => setChangelogEntry(e.target.value)}
+                placeholder="Notas de verificación (opcional)"
+                value={verificationNotes}
+                onChange={(e) => setVerificationNotes(e.target.value)}
                 className="w-64 h-10 text-sm"
               />
-              <Button variant="destructive" onClick={handleCloseTicket} disabled={isClosing || !changelogEntry.trim()}>
-                {isClosing ? "Cerrando..." : "Cerrar Ticket"}
+              <Button variant="secondary" onClick={() => handleVerifyResolution(true)} disabled={isVerifying}>
+                {isVerifying ? "Verificando..." : "Aprobar"}
+              </Button>
+              <Button variant="destructive" onClick={() => handleVerifyResolution(false)} disabled={isVerifying}>
+                {isVerifying ? "Verificando..." : "Rechazar"}
               </Button>
             </div>
+          ) : (
+            canCloseTicket &&
+            !ticket.resolved && (
+              <div className="flex items-center space-x-2">
+                <Textarea
+                  placeholder="Razón para cerrar el ticket"
+                  value={changelogEntry}
+                  onChange={(e) => setChangelogEntry(e.target.value)}
+                  className="w-64 h-10 text-sm"
+                />
+                <Button
+                  variant="destructive"
+                  onClick={handleCloseTicket}
+                  disabled={isClosing || !changelogEntry.trim()}
+                >
+                  {isClosing ? "Cerrando..." : "Cerrar Ticket"}
+                </Button>
+              </div>
+            )
           )}
         </DialogFooter>
       </DialogContent>

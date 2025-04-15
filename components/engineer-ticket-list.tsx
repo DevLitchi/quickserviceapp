@@ -270,7 +270,58 @@ export default function EngineerTicketList() {
     }
   }
 
-  const handleMarkAsResolved = async (ticketId: number, resolutionDetails: string, supportedBy?: string) => {
+  // Add this new function inside the component
+  const handleVerifyResolution = async (ticketId: number, isApproved: boolean, verificationNotes?: string) => {
+    try {
+      const response = await fetch(`/api/tickets/${ticketId}/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isApproved,
+          verificationNotes,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error al verificar ticket: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Refresh tickets after verification
+        await refreshTickets()
+
+        toast({
+          message: `Ticket ${isApproved ? "aprobado" : "rechazado"} correctamente`,
+          type: "success",
+        })
+      } else {
+        throw new Error(data.message || "Error al verificar ticket")
+      }
+    } catch (error: any) {
+      console.error("Error al verificar ticket:", error)
+      toast({
+        message: error.message || "Error al verificar ticket. Por favor intente de nuevo.",
+        type: "error",
+      })
+    }
+  }
+
+  // Update the handleMarkAsResolved function to include evidence
+  const handleMarkAsResolved = async (
+    ticketId: number,
+    resolutionDetails: string,
+    supportedBy?: string,
+    evidence?: Array<{
+      url: string
+      filename: string
+      contentType: string
+      description?: string
+    }>,
+  ) => {
     try {
       const response = await fetch(`/api/tickets/${ticketId}`, {
         method: "POST",
@@ -281,6 +332,7 @@ export default function EngineerTicketList() {
           action: "resolve",
           resolutionDetails,
           supportedBy,
+          evidence,
         }),
       })
 
@@ -341,11 +393,20 @@ export default function EngineerTicketList() {
     }
   }
 
+  // Update the getStatusBadge function to include verification status
   const getStatusBadge = (ticket: Ticket) => {
     if (ticket.pendingUserConfirmation) {
       return <Badge className="bg-purple-100 text-purple-800">Pendiente Confirmación</Badge>
     } else if (ticket.resolved) {
-      return <Badge className="bg-green-100 text-green-800">Resuelto</Badge>
+      if (ticket.verificationStatus === "pending") {
+        return <Badge className="bg-yellow-100 text-yellow-800">Pendiente Verificación</Badge>
+      } else if (ticket.verificationStatus === "approved") {
+        return <Badge className="bg-green-100 text-green-800">Verificado</Badge>
+      } else if (ticket.verificationStatus === "rejected") {
+        return <Badge className="bg-red-100 text-red-800">Rechazado</Badge>
+      } else {
+        return <Badge className="bg-green-100 text-green-800">Resuelto</Badge>
+      }
     } else {
       return <Badge className="bg-blue-100 text-blue-800">Abierto</Badge>
     }
@@ -548,6 +609,7 @@ export default function EngineerTicketList() {
           }
           onAddComment={handleAddComment}
           onMarkAsResolved={handleMarkAsResolved}
+          onVerifyResolution={handleVerifyResolution}
           userRole={userRole}
           currentUser={currentUser}
           showFixturaField={true}
