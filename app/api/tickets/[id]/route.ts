@@ -36,7 +36,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-// Update the POST function to handle evidence
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   try {
     const { action, ...data } = await request.json()
@@ -83,7 +82,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         success = await assignTicket(params.id, data.engineerName, data.engineerEmail)
         break
       case "resolve":
-        success = await resolveTicket(params.id, data.resolutionDetails, data.supportedBy, data.evidence)
+        success = await resolveTicket(params.id, data.resolutionDetails, data.supportedBy)
         break
       case "confirm":
         success = await confirmTicketResolution(params.id, data.confirmed)

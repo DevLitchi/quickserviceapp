@@ -23,12 +23,6 @@ export interface Ticket {
   supportedBy?: string // Nuevo campo para indicar quién dio soporte
   expAwarded?: number // EXP otorgada por resolver este ticket
   elapsedTime?: number // Tiempo transcurrido en milisegundos
-  // New fields for evidence and verification
-  evidence?: TicketEvidence[]
-  verificationStatus?: "pending" | "approved" | "rejected"
-  verifiedBy?: string
-  verifiedAt?: number
-  verificationNotes?: string
 }
 
 export interface TicketComment {
@@ -113,15 +107,4 @@ export interface ExtraTimeRequest {
   updatedBy?: string
   comments?: string
   scheduledDate?: number // Nueva propiedad para la fecha programada
-}
-
-// Add this new interface for evidence
-export interface TicketEvidence {
-  id: number
-  url: string
-  filename: string
-  contentType: string
-  uploadedBy: string
-  uploadedAt: number
-  description?: string
 }
