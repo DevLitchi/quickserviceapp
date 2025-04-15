@@ -1,36 +1,84 @@
+"use client"
+
 import type React from "react"
-import { Suspense } from "react"
+
+import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
 import { isAuthenticated, getUserRole, getCurrentUser } from "@/lib/auth"
 import EngineerTicketList from "@/components/engineer-ticket-list"
 import EngineerDashboard from "@/components/engineer-dashboard"
 import { Skeleton } from "@/components/ui/skeleton"
-import type { Metadata } from "next"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import DebugTicketData from "@/components/debug-ticket-data"
 
-export const metadata: Metadata = {
-  title: "Dashboard de Ingeniero | SFQS Ticket System",
-  description: "Gestiona tickets, visualiza estadísticas y monitorea tu progreso como ingeniero",
-}
+export default function EngineerDashboardPage() {
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null)
+  const [userRole, setUserRole] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-export default async function EngineerDashboardPage() {
-  const authenticated = await isAuthenticated()
-  const userRole = await getUserRole()
-  const currentUser = await getCurrentUser()
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const isAuth = await isAuthenticated()
+        const role = await getUserRole()
+        const user = await getCurrentUser()
 
-  console.log("Auth status:", authenticated)
-  console.log("User role:", userRole)
-  console.log("Current user:", currentUser ? "Found" : "Not found")
+        setAuthenticated(isAuth)
+        setUserRole(role)
+        setCurrentUser(user)
+        setLoading(false)
 
-  if (!authenticated) {
-    redirect("/")
-  }
+        if (!isAuth) {
+          redirect("/")
+        }
 
-  // Solo ingenieros pueden acceder a esta página
-  if (userRole !== "ingeniero") {
-    redirect("/dashboard")
+        if (role !== "ingeniero" && role !== "admin") {
+          redirect("/dashboard")
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error)
+        setLoading(false)
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  // Auto-refresh functionality for specific user
+  useEffect(() => {
+    let refreshInterval: NodeJS.Timeout | null = null
+
+    if (currentUser?.email === "dbasilio@milwaukeeelectronics.com") {
+      console.log("Auto-refresh enabled for admin user")
+      refreshInterval = setInterval(() => {
+        console.log("Auto-refreshing dashboard for admin user")
+        window.location.reload()
+      }, 60000) // 60000 ms = 1 minute
+    }
+
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval)
+      }
+    }
+  }, [currentUser])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto py-6 px-4">
+          <Skeleton className="h-8 w-64 mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Skeleton className="h-[400px] w-full rounded-lg" />
+            </div>
+            <Skeleton className="h-[400px] w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   // Prepare engineer data with defaults for any missing fields
@@ -69,11 +117,13 @@ export default async function EngineerDashboardPage() {
               <h2 id="tickets-heading" className="sr-only">
                 Gestión de Tickets
               </h2>
-              <Suspense fallback={<TicketListSkeleton />}>
+              {loading ? (
+                <TicketListSkeleton />
+              ) : (
                 <ErrorBoundary>
                   <EngineerTicketList />
                 </ErrorBoundary>
-              </Suspense>
+              )}
 
               {process.env.NODE_ENV !== "production" && <DebugTicketData />}
             </section>
@@ -84,9 +134,7 @@ export default async function EngineerDashboardPage() {
               <h2 id="stats-heading" className="sr-only">
                 Estadísticas y Progreso
               </h2>
-              <Suspense fallback={<DashboardSkeleton />}>
-                <EngineerDashboard engineerData={engineerData} />
-              </Suspense>
+              {loading ? <DashboardSkeleton /> : <EngineerDashboard engineerData={engineerData} />}
             </section>
           </div>
         </div>

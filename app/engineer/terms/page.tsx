@@ -1,6 +1,6 @@
-import type { Metadata } from "next"
+import { Card, CardContent } from "@/components/ui/card"
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Términos de Servicio | SFQS Ticket System",
   description: "Términos y condiciones de uso del sistema de tickets SFQS",
 }
@@ -8,89 +8,118 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Términos de Servicio</h1>
+      <h1 className="text-3xl font-bold mb-6">Términos de Servicio</h1>
+      <p className="text-gray-600 mb-8">
+        Estos términos y condiciones rigen el uso del Sistema de Tickets SFQS de Milwaukee Electronics. Al acceder o
+        utilizar el sistema, aceptas estos términos en su totalidad.
+      </p>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
-          <section>
-            <h2 className="text-xl font-semibold mb-3">1. Aceptación de los Términos</h2>
-            <p className="text-gray-600">
-              Al acceder y utilizar el Sistema de Tickets SFQS de Milwaukee Electronics, usted acepta estar sujeto a
-              estos Términos de Servicio. Si no está de acuerdo con alguna parte de estos términos, no podrá acceder al
-              servicio.
-            </p>
-          </section>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">1. Aceptación de los Términos</h2>
+          <p className="mb-4">
+            Al acceder y utilizar el Sistema de Tickets SFQS ("el Sistema"), aceptas estar legalmente vinculado por
+            estos Términos de Servicio. Si no estás de acuerdo con alguno de estos términos, no debes utilizar el
+            Sistema.
+          </p>
+        </CardContent>
+      </Card>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">2. Descripción del Servicio</h2>
-            <p className="text-gray-600">
-              El Sistema de Tickets SFQS es una plataforma interna diseñada para gestionar y resolver problemas técnicos
-              relacionados con las fixturas y sistemas de prueba en Milwaukee Electronics. El sistema permite a los
-              usuarios crear tickets, asignarlos a ingenieros, y seguir su progreso hasta la resolución.
-            </p>
-          </section>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">2. Descripción del Servicio</h2>
+          <p className="mb-4">
+            El Sistema de Tickets SFQS es una plataforma interna diseñada para gestionar y resolver problemas técnicos
+            relacionados con las fixturas y sistemas de Milwaukee Electronics. El Sistema permite a los usuarios crear
+            tickets, asignarlos a ingenieros, y realizar un seguimiento de su resolución.
+          </p>
+        </CardContent>
+      </Card>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">3. Cuentas de Usuario</h2>
-            <p className="text-gray-600">
-              Los usuarios son responsables de mantener la confidencialidad de sus credenciales de acceso y de todas las
-              actividades que ocurran bajo su cuenta. Notifique inmediatamente a Milwaukee Electronics sobre cualquier
-              uso no autorizado de su cuenta o cualquier otra violación de seguridad.
-            </p>
-          </section>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">3. Cuentas de Usuario</h2>
+          <p className="mb-4">
+            3.1. Para utilizar el Sistema, debes tener una cuenta de usuario válida proporcionada por Milwaukee
+            Electronics.
+          </p>
+          <p className="mb-4">
+            3.2. Eres responsable de mantener la confidencialidad de tu contraseña y de todas las actividades que
+            ocurran bajo tu cuenta.
+          </p>
+          <p className="mb-4">
+            3.3. Debes notificar inmediatamente a Milwaukee Electronics sobre cualquier uso no autorizado de tu cuenta o
+            cualquier otra violación de seguridad.
+          </p>
+        </CardContent>
+      </Card>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">4. Uso Aceptable</h2>
-            <p className="text-gray-600">Usted acepta no utilizar el Sistema de Tickets SFQS para:</p>
-            <ul className="list-disc pl-5 mt-2 text-gray-600">
-              <li>Actividades ilegales o fraudulentas</li>
-              <li>Hostigar, abusar o dañar a otra persona</li>
-              <li>Enviar spam o contenido no solicitado</li>
-              <li>Intentar acceder no autorizado a cualquier parte del sistema</li>
-              <li>Interferir con el funcionamiento normal del sistema</li>
-            </ul>
-          </section>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">4. Uso Aceptable</h2>
+          <p className="mb-4">4.1. Aceptas utilizar el Sistema solo para fines laborales legítimos.</p>
+          <p className="mb-4">
+            4.2. No utilizarás el Sistema para actividades ilegales, fraudulentas o no autorizadas.
+          </p>
+          <p className="mb-4">4.3. No intentarás acceder a áreas del Sistema para las cuales no tienes autorización.</p>
+          <p className="mb-4">
+            4.4. No interferirás con el funcionamiento normal del Sistema ni intentarás sobrecargar los servidores.
+          </p>
+        </CardContent>
+      </Card>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">5. Propiedad Intelectual</h2>
-            <p className="text-gray-600">
-              El Sistema de Tickets SFQS y su contenido original, características y funcionalidad son propiedad de
-              Milwaukee Electronics y están protegidos por leyes internacionales de derechos de autor, marcas
-              registradas, patentes, secretos comerciales y otros derechos de propiedad intelectual o de propiedad.
-            </p>
-          </section>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">5. Propiedad Intelectual</h2>
+          <p className="mb-4">
+            5.1. El Sistema, incluyendo todo su contenido, características y funcionalidad, es propiedad de Milwaukee
+            Electronics y está protegido por leyes de propiedad intelectual.
+          </p>
+          <p className="mb-4">
+            5.2. No se te concede ningún derecho o licencia para utilizar cualquier marca registrada, logotipo o
+            material con derechos de autor sin el consentimiento previo por escrito de Milwaukee Electronics.
+          </p>
+        </CardContent>
+      </Card>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">6. Limitación de Responsabilidad</h2>
-            <p className="text-gray-600">
-              Milwaukee Electronics no será responsable por daños indirectos, incidentales, especiales, consecuentes o
-              punitivos, o cualquier pérdida de beneficios o ingresos, ya sea incurrida directa o indirectamente, o
-              cualquier pérdida de datos, uso, buena voluntad, u otras pérdidas intangibles, resultantes de su acceso o
-              uso o incapacidad para acceder o usar el servicio.
-            </p>
-          </section>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">6. Limitación de Responsabilidad</h2>
+          <p className="mb-4">
+            6.1. Milwaukee Electronics no será responsable por daños directos, indirectos, incidentales, especiales o
+            consecuentes que resulten del uso o la imposibilidad de usar el Sistema.
+          </p>
+          <p className="mb-4">
+            6.2. Milwaukee Electronics no garantiza que el Sistema esté libre de errores o que funcione sin
+            interrupciones.
+          </p>
+        </CardContent>
+      </Card>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">7. Cambios en los Términos</h2>
-            <p className="text-gray-600">
-              Milwaukee Electronics se reserva el derecho, a su sola discreción, de modificar o reemplazar estos
-              términos en cualquier momento. Si una revisión es material, proporcionaremos al menos 30 días de aviso
-              antes de que los nuevos términos entren en vigencia.
-            </p>
-          </section>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">7. Modificaciones de los Términos</h2>
+          <p className="mb-4">
+            Milwaukee Electronics se reserva el derecho de modificar estos Términos de Servicio en cualquier momento.
+            Las modificaciones entrarán en vigor inmediatamente después de su publicación en el Sistema. El uso
+            continuado del Sistema después de tales modificaciones constituirá tu aceptación de los nuevos términos.
+          </p>
+        </CardContent>
+      </Card>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">8. Contacto</h2>
-            <p className="text-gray-600">
-              Si tiene alguna pregunta sobre estos Términos, por favor contacte a legal@milwaukeeelectronics.com.
-            </p>
-          </section>
-
-          <div className="pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-500">Última actualización: 15 de abril de 2025</p>
-          </div>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <h2 className="text-xl font-semibold mb-4">8. Ley Aplicable</h2>
+          <p className="mb-4">
+            Estos Términos de Servicio se regirán e interpretarán de acuerdo con las leyes del estado donde Milwaukee
+            Electronics tiene su sede principal, sin dar efecto a ningún principio de conflictos de leyes.
+          </p>
+          <p className="mb-4">
+            Última actualización:{" "}
+            {new Date().toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric" })}
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
