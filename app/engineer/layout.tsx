@@ -7,7 +7,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { ClipboardList, User, Award, LogOut, FileText, Settings, BarChart2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { logout, getUserRole } from "@/lib/auth"
+import { logout, getUserRole, getUserEmail } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
 export default function EngineerLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +16,8 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [userRole, setUserRole] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,7 +26,9 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
 
     const checkUserRole = async () => {
       const role = await getUserRole()
+      const email = await getUserEmail()
       setUserRole(role)
+      setUserEmail(email)
 
       // Redirigir si no es ingeniero
       if (role !== "ingeniero") {
@@ -42,6 +46,33 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [router])
+
+  // Set up auto-refresh for dbasilio@milwaukeeelectronics.com on dashboard page
+  useEffect(() => {
+    // Clear any existing interval when component mounts or dependencies change
+    if (refreshInterval) {
+      clearInterval(refreshInterval)
+      setRefreshInterval(null)
+    }
+
+    // Only set up refresh for the specific user and only on the dashboard page
+    if (userEmail === "dbasilio@milwaukeeelectronics.com" && pathname === "/engineer/dashboard") {
+      console.log("Setting up auto-refresh for admin user on dashboard")
+      const interval = setInterval(() => {
+        console.log("Auto-refreshing dashboard page")
+        window.location.reload()
+      }, 60000) // 60000 ms = 1 minute
+
+      setRefreshInterval(interval)
+    }
+
+    // Clean up interval on unmount
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval)
+      }
+    }
+  }, [pathname, userEmail])
 
   // Actualizar el array de enlaces de navegación para incluir las estadísticas detalladas
   const navLinks = [
