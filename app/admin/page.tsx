@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ClipboardList, Users, Clock, Settings, FileText } from "lucide-react"
+import { ClipboardList, Clock, Settings, FileText } from "lucide-react"
 
 export default function AdminHomePage() {
   return (
@@ -28,26 +28,6 @@ export default function AdminHomePage() {
           <CardFooter>
             <Button asChild className="w-full">
               <Link href="/dashboard">Ver Tickets</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              Gestión de Usuarios
-            </CardTitle>
-            <CardDescription>Administra las cuentas de usuario</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">
-              Crea, edita y gestiona cuentas de usuario. Asigna roles y permisos a los usuarios del sistema.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/dashboard/users">Gestionar Usuarios</Link>
             </Button>
           </CardFooter>
         </Card>
