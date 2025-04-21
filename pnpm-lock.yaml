@@ -142,7 +142,7 @@ importers:
         version: 0.454.0(react@19.0.0)
       mongodb:
         specifier: latest
-        version: 6.15.0(@aws-sdk/credential-providers@3.787.0)(@mongodb-js/zstd@2.0.1)(gcp-metadata@6.1.1)(kerberos@2.2.2)(mongodb-client-encryption@6.3.0)(snappy@7.2.2)(socks@2.8.4)
+        version: 6.16.0(@aws-sdk/credential-providers@3.787.0)(@mongodb-js/zstd@2.0.1)(gcp-metadata@6.1.1)(kerberos@2.2.2)(mongodb-client-encryption@6.3.0)(snappy@7.2.2)(socks@2.8.4)
       mongodb-client-encryption:
         specifier: latest
         version: 6.3.0
@@ -2045,8 +2045,8 @@ packages:
   mongodb-connection-string-url@3.0.2:
     resolution: {integrity: sha512-rMO7CGo/9BFwyZABcKAWL8UJwH/Kc2x0g72uhDWzG48URRax5TCIcJ7Rc3RZqffZzO/Gwff/jyKwCU9TN8gehA==}
 
-  mongodb@6.15.0:
-    resolution: {integrity: sha512-ifBhQ0rRzHDzqp9jAQP6OwHSH7dbYIQjD3SbJs9YYk9AikKEettW/9s/tbSFDTpXcRbF+u1aLrhHxDFaYtZpFQ==}
+  mongodb@6.16.0:
+    resolution: {integrity: sha512-D1PNcdT0y4Grhou5Zi/qgipZOYeWrhLEpk33n3nm6LGtz61jvO88WlrWCK/bigMjpnOdAUKKQwsGIl0NtWMyYw==}
     engines: {node: '>=16.20.1'}
     peerDependencies:
       '@aws-sdk/credential-providers': ^3.188.0
@@ -4748,7 +4748,7 @@ snapshots:
       '@types/whatwg-url': 11.0.5
       whatwg-url: 14.2.0
 
-  mongodb@6.15.0(@aws-sdk/credential-providers@3.787.0)(@mongodb-js/zstd@2.0.1)(gcp-metadata@6.1.1)(kerberos@2.2.2)(mongodb-client-encryption@6.3.0)(snappy@7.2.2)(socks@2.8.4):
+  mongodb@6.16.0(@aws-sdk/credential-providers@3.787.0)(@mongodb-js/zstd@2.0.1)(gcp-metadata@6.1.1)(kerberos@2.2.2)(mongodb-client-encryption@6.3.0)(snappy@7.2.2)(socks@2.8.4):
     dependencies:
       '@mongodb-js/saslprep': 1.2.2
       bson: 6.10.3

@@ -2,13 +2,24 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import PasswordChangeForm from "@/components/password-change-form"
+import NotificationPreferences from "@/components/notification-preferences"
+import { getUserId } from "@/lib/auth"
 
 export default function EngineerSettingsPage() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const [userId, setUserId] = useState(null)
+
+  useEffect(() => {
+    async function fetchUserId() {
+      const id = await getUserId()
+      setUserId(id)
+    }
+
+    fetchUserId()
+  }, [])
 
   useEffect(() => {
     async function checkSession() {
@@ -44,15 +55,12 @@ export default function EngineerSettingsPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuración de Cuenta</CardTitle>
-          <CardDescription>Cambia tu contraseña y administra la configuración de tu cuenta.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PasswordChangeForm />
-        </CardContent>
-      </Card>
+      <h1 className="text-2xl font-bold mb-6">Configuración de Ingeniero</h1>
+
+      <div className="grid gap-6">
+        <PasswordChangeForm />
+        {userId && <NotificationPreferences userId={userId} />}
+      </div>
     </div>
   )
 }

@@ -3,13 +3,13 @@
 import { getUsers } from "./auth"
 import type { User, Ticket } from "./types"
 
-// Function to send email notifications to all test engineers
+// Add these imports at the top
+import { getNotificationPreferences } from "./notification-preferences"
+import { sendWhatsAppNotification, generateWhatsAppMessage } from "./whatsapp"
+
+// Update the notifyTestEngineers function
 export async function notifyTestEngineers(ticket: Partial<Ticket>): Promise<boolean> {
   try {
-    // In a real application, you would:
-    // 1. Get all users with role "engineer" and area "Test Engineering"
-    // 2. Send emails to each of them using an email service like SendGrid, AWS SES, etc.
-
     // Get all users
     const allUsers = await getUsers()
 
@@ -21,16 +21,28 @@ export async function notifyTestEngineers(ticket: Partial<Ticket>): Promise<bool
       return false
     }
 
-    // Log the notification (in a real app, this would send actual emails)
-    console.log(`Sending email notifications to ${testEngineers.length} test engineers about ticket ${ticket.fixtura}`)
+    console.log(`Sending notifications to ${testEngineers.length} test engineers about ticket ${ticket.fixtura}`)
 
-    // For each engineer, send an email
+    // For each engineer, check their notification preferences and send accordingly
     for (const engineer of testEngineers) {
-      await sendEmail({
-        to: engineer.email,
-        subject: `New Ticket Opened: ${ticket.fixtura}`,
-        body: generateEmailBody(ticket, engineer),
-      })
+      // Get notification preferences
+      const preferences = await getNotificationPreferences(engineer.id)
+
+      // Send email if enabled
+      if (preferences?.email) {
+        await sendEmail({
+          to: engineer.email,
+          subject: `New Ticket Opened: ${ticket.fixtura}`,
+          body: generateEmailBody(ticket, engineer),
+        })
+      }
+
+      // Send WhatsApp if enabled and phone number is provided
+      if (preferences?.whatsapp && preferences.phoneNumber) {
+        // Generate the message first - now with await
+        const message = await generateWhatsAppMessage(ticket)
+        await sendWhatsAppNotification(preferences.phoneNumber, message)
+      }
     }
 
     return true
@@ -40,21 +52,34 @@ export async function notifyTestEngineers(ticket: Partial<Ticket>): Promise<bool
   }
 }
 
-// Helper function to send emails (mock implementation)
+// Replace the sendEmail function with this implementation that uses nodemailer
 async function sendEmail({ to, subject, body }: { to: string; subject: string; body: string }): Promise<boolean> {
-  // In a real application, you would integrate with an email service
-  // For example, using SendGrid:
-  // await sendgrid.send({ to, from: 'tickets@milwaukeeelectronics.com', subject, html: body })
+  try {
+    const nodemailer = require("nodemailer")
 
-  // For now, we'll just log the email details
-  console.log(`Email would be sent to: ${to}`)
-  console.log(`Subject: ${subject}`)
-  console.log(`Body: ${body}`)
+    // Create a transporter using Gmail credentials from environment variables
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS,
+      },
+    })
 
-  // Simulate a delay for sending the email
-  await new Promise((resolve) => setTimeout(resolve, 100))
+    // Send the email
+    const info = await transporter.sendMail({
+      from: `"SFQS Ticket System" <${process.env.GMAIL_USER}>`,
+      to,
+      subject,
+      html: body,
+    })
 
-  return true
+    console.log(`Email sent: ${info.messageId}`)
+    return true
+  } catch (error) {
+    console.error("Error sending email:", error)
+    return false
+  }
 }
 
 // Generate the email body based on ticket details
