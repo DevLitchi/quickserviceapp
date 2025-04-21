@@ -216,6 +216,28 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
         </div>
       </header>
       <main className="flex-1">{children}</main>
+      <footer className="bg-white border-t py-6">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <p className="text-sm text-gray-600">
+                &copy; {new Date().getFullYear()} SFQS Ticket System. Todos los derechos reservados.
+              </p>
+            </div>
+            <div className="flex space-x-4">
+              <Link href="/engineer/help" className="text-sm text-gray-600 hover:text-primary">
+                Ayuda
+              </Link>
+              <Link href="/engineer/terms" className="text-sm text-gray-600 hover:text-primary">
+                Términos
+              </Link>
+              <Link href="/engineer/privacy" className="text-sm text-gray-600 hover:text-primary">
+                Privacidad
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
