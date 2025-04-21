@@ -85,16 +85,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Desktop navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               <Link
-                href="/admin/settings"
+                href="/dashboard"
                 className={cn(
                   "flex items-center space-x-1 py-2 px-3 rounded-md transition-colors",
-                  pathname === "/admin/settings"
+                  pathname === "/dashboard"
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-gray-700 hover:text-primary hover:bg-gray-50",
                 )}
               >
                 <ClipboardList className="h-5 w-5" />
-                <span>Configuración</span>
+                <span>Tickets</span>
               </Link>
               <Link
                 href="/dashboard/users"
@@ -149,17 +149,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <nav className="flex flex-col space-y-2 pb-3">
               <Link
-                href="/admin/settings"
+                href="/dashboard"
                 className={cn(
                   "flex items-center space-x-2 py-2 px-3 rounded-md",
-                  pathname === "/admin/settings"
+                  pathname === "/dashboard"
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-gray-700 hover:text-primary hover:bg-gray-50",
                 )}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <ClipboardList className="h-5 w-5" />
-                <span>Configuración</span>
+                <span>Tickets</span>
               </Link>
               <Link
                 href="/dashboard/users"

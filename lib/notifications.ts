@@ -1,33 +1,79 @@
 "use server"
 
-import { getCollection } from "./db"
-import { sendEmail, generateEmailBody } from "./email"
+import { getUsers } from "./auth"
+import type { User, Ticket } from "./types"
 
-export async function notifyTestEngineers(ticket: any): Promise<void> {
+// Function to send email notifications to all test engineers
+export async function notifyTestEngineers(ticket: Partial<Ticket>): Promise<boolean> {
   try {
-    const usersCollection = await getCollection("users")
-    const engineers = await usersCollection.find({ role: "ingeniero" }).toArray()
+    // In a real application, you would:
+    // 1. Get all users with role "engineer" and area "Test Engineering"
+    // 2. Send emails to each of them using an email service like SendGrid, AWS SES, etc.
 
-    console.log(`Found ${engineers.length} test engineers to notify`)
+    // Get all users
+    const allUsers = await getUsers()
 
-    for (const engineer of engineers) {
-      // Generar el cuerpo del correo electrónico
-      const html = generateEmailBody(ticket, engineer)
+    // Filter for test engineers
+    const testEngineers = allUsers.filter((user) => user.role === "engineer" && user.area === "Test Engineering")
 
-      // Enviar el correo electrónico
-      const success = await sendEmail({
-        to: engineer.email,
-        subject: "New Ticket Requires Attention",
-        html: html,
-      })
-
-      if (success) {
-        console.log(`Notification email sent to engineer: ${engineer.email}`)
-      } else {
-        console.error(`Failed to send notification email to engineer: ${engineer.email}`)
-      }
+    if (testEngineers.length === 0) {
+      console.log("No test engineers found to notify")
+      return false
     }
+
+    // Log the notification (in a real app, this would send actual emails)
+    console.log(`Sending email notifications to ${testEngineers.length} test engineers about ticket ${ticket.fixtura}`)
+
+    // For each engineer, send an email
+    for (const engineer of testEngineers) {
+      await sendEmail({
+        to: engineer.email,
+        subject: `New Ticket Opened: ${ticket.fixtura}`,
+        body: generateEmailBody(ticket, engineer),
+      })
+    }
+
+    return true
   } catch (error) {
-    console.error("Error al notificar a los ingenieros:", error)
+    console.error("Failed to send notifications:", error)
+    return false
   }
+}
+
+// Helper function to send emails (mock implementation)
+async function sendEmail({ to, subject, body }: { to: string; subject: string; body: string }): Promise<boolean> {
+  // In a real application, you would integrate with an email service
+  // For example, using SendGrid:
+  // await sendgrid.send({ to, from: 'tickets@milwaukeeelectronics.com', subject, html: body })
+
+  // For now, we'll just log the email details
+  console.log(`Email would be sent to: ${to}`)
+  console.log(`Subject: ${subject}`)
+  console.log(`Body: ${body}`)
+
+  // Simulate a delay for sending the email
+  await new Promise((resolve) => setTimeout(resolve, 100))
+
+  return true
+}
+
+// Generate the email body based on ticket details
+function generateEmailBody(ticket: Partial<Ticket>, engineer: Partial<User>): string {
+  return `
+    <h2>New Ticket Requires Attention</h2>
+    <p>Hello ${engineer.name},</p>
+    <p>A new ticket has been opened that requires your attention:</p>
+    <ul>
+      <li><strong>Fixture:</strong> ${ticket.fixtura}</li>
+      <li><strong>Type:</strong> ${ticket.tipo}${ticket.tipo === "Other" ? `: ${ticket.otherDescription}` : ""}</li>
+      <li><strong>Priority:</strong> ${ticket.prioridad}</li>
+      <li><strong>Area:</strong> ${ticket.area}</li>
+      <li><strong>Reported by:</strong> ${ticket.supervisor}</li>
+    </ul>
+    <p>Please log in to the SFQS Ticket System to review and take action on this ticket.</p>
+    <p>
+      <a href="https://sfqs.milwaukeeelectronics.com/engineer/dashboard" style="background-color: #3b82f6; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px;">View Ticket</a>
+    </p>
+    <p>Thank you,<br>SFQS Ticket System</p>
+  `
 }

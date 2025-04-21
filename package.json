@@ -70,8 +70,7 @@
     "bcryptjs": "latest",
     "framer-motion": "latest",
     "@vercel/blob": "latest",
-    "nanoid": "latest",
-    "nodemailer": "latest"
+    "nanoid": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
