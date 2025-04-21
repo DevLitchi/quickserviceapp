@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 // Add the Settings icon import at the top with the other icons
@@ -240,19 +240,9 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
       </header>
-      <main className="flex-1">{children}</main>
-      <footer className="bg-white border-t py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-sm text-gray-600">
-                &copy; {new Date().getFullYear()} SFQS Ticket System. Todos los derechos reservados.
-              </p>
-            </div>
-            <div className="flex space-x-4"></div>
-          </div>
-        </div>
-      </footer>
+      <main className="flex-1">
+        <Suspense>{children}</Suspense>
+      </main>
     </div>
   )
 }
