@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 import { getCollection } from "./db"
 import { ObjectId } from "mongodb"
 import type { User } from "./types"
-import { comparePassword } from "@/lib/passwordUtils"
+import * as bcrypt from "bcryptjs"
 
 // Add the missing getSession export
 export async function getSession() {
@@ -40,7 +40,7 @@ export async function authenticate(email: string, password: string): Promise<boo
     }
 
     // Verificar la contraseña utilizando bcrypt
-    const passwordMatch = await comparePassword(password, user.password)
+    const passwordMatch = await bcrypt.compare(password, user.password)
 
     if (!passwordMatch) {
       console.log(`Authentication failed for ${email}: Invalid password`)
