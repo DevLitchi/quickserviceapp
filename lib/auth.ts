@@ -4,7 +4,6 @@ import { cookies } from "next/headers"
 import { getCollection } from "./db"
 import { ObjectId } from "mongodb"
 import type { User } from "./types"
-import * as bcrypt from "bcryptjs"
 
 // Add the missing getSession export
 export async function getSession() {
@@ -32,18 +31,10 @@ export async function authenticate(email: string, password: string): Promise<boo
   try {
     // Obtener el usuario de la base de datos
     const usersCollection = await getCollection("users")
-    const user = await usersCollection.findOne({ email })
+    const user = await usersCollection.findOne({ email, password })
 
     if (!user) {
-      console.log(`Authentication failed for ${email}: User not found`)
-      return false
-    }
-
-    // Verificar la contraseña utilizando bcrypt
-    const passwordMatch = await bcrypt.compare(password, user.password)
-
-    if (!passwordMatch) {
-      console.log(`Authentication failed for ${email}: Invalid password`)
+      console.log(`Authentication failed for ${email}`)
       return false
     }
 
