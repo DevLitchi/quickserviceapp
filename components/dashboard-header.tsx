@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LogOut, Ticket, ClipboardList, Users, Clock, User, BarChart2, FileText } from "lucide-react"
+import { LogOut, Ticket, ClipboardList, Users, User, BarChart2, FileText } from "lucide-react"
 import { logout, getUserRole } from "@/lib/auth"
 import { useEffect, useState } from "react"
 
@@ -75,38 +75,31 @@ export default function DashboardHeader() {
             <span className="hidden md:inline">Tickets</span>
           </Link>
 
-          <Link href="/dashboard/changelog" className="flex items-center space-x-1 text-gray-700 hover:text-primary">
-            <FileText className="h-5 w-5" />
-            <span className="hidden md:inline">Changelog</span>
-          </Link>
+          {/* Consolidated changelog access for admin and engineers */}
+          {(userRole === "admin" || userRole === "ingeniero") && (
+            <Link href="/dashboard/changelog" className="flex items-center space-x-1 text-gray-700 hover:text-primary">
+              <FileText className="h-5 w-5" />
+              <span className="hidden md:inline">Changelog</span>
+            </Link>
+          )}
 
-          <Link
-            href="/dashboard/extra-time/requests"
-            className="flex items-center space-x-1 text-gray-700 hover:text-primary"
-          >
-            <Clock className="h-5 w-5" />
-            <span className="hidden md:inline">Extra Time</span>
-          </Link>
+          {userRole === "admin" && (
+            <Link href="/dashboard/users" className="flex items-center space-x-1 text-gray-700 hover:text-primary">
+              <Users className="h-5 w-5" />
+              <span className="hidden md:inline">Users</span>
+            </Link>
+          )}
 
-          {(userRole === "admin" || userRole === "gerente") && (
+          {/* Engineer stats only for engineers */}
+          {userRole === "ingeniero" && (
             <>
-              <Link href="/dashboard/users" className="flex items-center space-x-1 text-gray-700 hover:text-primary">
-                <Users className="h-5 w-5" />
-                <span className="hidden md:inline">Users</span>
-              </Link>
-
               <Link
                 href="/dashboard/engineer-stats"
                 className="flex items-center space-x-1 text-gray-700 hover:text-primary"
               >
                 <BarChart2 className="h-5 w-5" />
-                <span className="hidden md:inline">Estadísticas Ingenieros</span>
+                <span className="hidden md:inline">Estadísticas</span>
               </Link>
-            </>
-          )}
-
-          {userRole === "ingeniero" && (
-            <>
               <Link href="/engineer/profile" className="flex items-center space-x-1 text-gray-700 hover:text-primary">
                 <User className="h-5 w-5" />
                 <span className="hidden md:inline">Mi Perfil</span>

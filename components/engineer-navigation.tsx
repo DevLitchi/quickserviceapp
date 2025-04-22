@@ -9,7 +9,7 @@ const links = [
   { href: "/engineer/dashboard", label: "Gestión de Tickets", icon: ClipboardList },
   { href: "/engineer/profile", label: "Perfil", icon: User },
   { href: "/dashboard/engineer-stats", label: "Estadísticas", icon: BarChart },
-  { href: "/engineer/changelog", label: "Changelog", icon: FileText },
+  { href: "/dashboard/changelog", label: "Changelog", icon: FileText }, // Updated to consolidated route
   { href: "/engineer/settings", label: "Configuración", icon: Settings },
 ]
 

@@ -4,8 +4,7 @@ import type React from "react"
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-// Add the Settings icon import at the top with the other icons
-import { Ticket, PlusCircle, Search, Clock, LogOut, Settings, FileText } from "lucide-react"
+import { Ticket, PlusCircle, Search, LogOut, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logout, getUserRole } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -109,31 +108,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 <PlusCircle className="h-5 w-5" />
                 <span>Crear Ticket</span>
               </Link>
-              <Link
-                href="/user/extra-time"
-                className={cn(
-                  "flex items-center space-x-1 py-2 px-3 rounded-md transition-colors",
-                  pathname === "/user/extra-time"
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                )}
-              >
-                <Clock className="h-5 w-5" />
-                <span>Pedir Tiempo Extra</span>
-              </Link>
-              <Link
-                href="/user/changelog"
-                className={cn(
-                  "flex items-center space-x-1 py-2 px-3 rounded-md transition-colors",
-                  pathname === "/user/changelog"
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                )}
-              >
-                <FileText className="h-5 w-5" />
-                <span>Changelog</span>
-              </Link>
-              {/* Add the Settings link in the desktop navigation section, before the Logout button */}
+              {/* Settings link */}
               <Link
                 href="/user/settings"
                 className={cn(
@@ -188,33 +163,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 <PlusCircle className="h-5 w-5" />
                 <span>Crear Ticket</span>
               </Link>
-              <Link
-                href="/user/extra-time"
-                className={cn(
-                  "flex items-center space-x-2 py-2 px-3 rounded-md",
-                  pathname === "/user/extra-time"
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Clock className="h-5 w-5" />
-                <span>Pedir Tiempo Extra</span>
-              </Link>
-              <Link
-                href="/user/changelog"
-                className={cn(
-                  "flex items-center space-x-2 py-2 px-3 rounded-md",
-                  pathname === "/user/changelog"
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <FileText className="h-5 w-5" />
-                <span>Changelog</span>
-              </Link>
-              {/* Also add the Settings link in the mobile navigation section, before the Logout button */}
+              {/* Settings link in mobile menu */}
               <Link
                 href="/user/settings"
                 className={cn(
