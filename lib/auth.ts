@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 import { getCollection } from "./db"
 import { ObjectId } from "mongodb"
 import type { User } from "./types"
-import { comparePassword } from "./lib/passwordUtils"
+import { comparePassword } from "@/lib/passwordUtils"
 
 // Add the missing getSession export
 export async function getSession() {
