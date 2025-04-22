@@ -79,7 +79,7 @@ export default function TicketList() {
       // Obtener tickets
       const response = await fetch(`/api/tickets?filter=${filter}`)
       if (!response.ok) {
-        throw new Error(`Error al obtener tickets: ${response.status} ${response.statusText}`)
+        throw new Error("Error al obtener tickets")
       }
 
       const data = await response.json()

@@ -88,7 +88,7 @@ export default function LoginForm() {
         </form>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" type="submit" disabled={isLoading}>
+        <Button className="w-full" onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? "Logging in..." : "Login"}
         </Button>
       </CardFooter>

@@ -13,7 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle, Loader2, Clock } from "lucide-react"
 import { ElapsedTimeCounter } from "@/components/elapsed-time-counter"
 import type { Ticket, TicketComment, User } from "@/lib/types"
-import { toast } from "@/components/ui/use-toast"
 
 interface TicketDetailsModalProps {
   ticket: Ticket
@@ -122,13 +121,6 @@ export default function TicketDetailsModal({
     setIsAssigning(true)
     try {
       await onAssignTicket(ticket.id)
-    } catch (error) {
-      console.error("Error al asignar ticket:", error)
-      // Add toast notification for error
-      toast({
-        message: "Error al asignar ticket. Por favor intente de nuevo.",
-        type: "error",
-      })
     } finally {
       setIsAssigning(false)
     }

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { LogOut, Ticket, ClipboardList, Users, User, BarChart2, FileText } from "lucide-react"
 import { logout, getUserRole } from "@/lib/auth"
 import { useEffect, useState } from "react"
-import { toast } from "@/components/ui/use-toast"
 
 export default function DashboardHeader() {
   const router = useRouter()
@@ -29,16 +28,8 @@ export default function DashboardHeader() {
   }, [])
 
   const handleLogout = async () => {
-    try {
-      await logout()
-      router.push("/")
-    } catch (error) {
-      console.error("Error during logout:", error)
-      toast({
-        message: "Error al cerrar sesión. Por favor intente de nuevo.",
-        type: "error",
-      })
-    }
+    await logout()
+    router.push("/")
   }
 
   // Show loading state or nothing while determining user role
