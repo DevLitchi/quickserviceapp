@@ -16,9 +16,9 @@ export default async function EngineerTeamStatsPage() {
     redirect("/login")
   }
 
-  // Permitir acceso a administradores, gerentes e ingenieros
-  if (userRole !== "admin" && userRole !== "gerente" && userRole !== "ingeniero") {
-    redirect("/dashboard")
+  // Only engineers can access this page now
+  if (userRole !== "ingeniero") {
+    redirect("/")
   }
 
   return (

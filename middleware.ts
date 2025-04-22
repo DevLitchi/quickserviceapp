@@ -8,37 +8,42 @@ export function middleware(request: NextRequest) {
   const isAuthenticated = authCookie?.value === "true"
   const userRole = roleCookie?.value
 
-  // Rutas públicas que no requieren autenticación
-  const publicRoutes = ["/", "/login", "/register"]
+  // Rutas públicas que no requieren autenticación - Removed /register
+  const publicRoutes = ["/", "/login"]
 
-  // Rutas específicas por rol - Asegurarse de que todos los roles puedan acceder a las rutas de tickets
-  const adminRoutes = [
-    "/admin",
-    "/dashboard",
-    "/dashboard/users",
-    "/dashboard/changelog",
-    "/dashboard/extra-time",
-    "/dashboard/engineer-stats",
-  ]
-  const engineerRoutes = [
-    "/engineer",
-    "/engineer/changelog",
-    "/engineer/stats",
-    "/dashboard/engineer-stats",
-    "/dashboard/changelog",
-  ]
-  const userRoutes = ["/user", "/user/changelog", "/dashboard/changelog", "/dashboard/engineer-stats"]
+  // Rutas específicas por rol - Removed restricted routes
+  const adminRoutes = ["/admin", "/dashboard", "/dashboard/users"]
+  const engineerRoutes = ["/engineer", "/engineer/stats", "/dashboard/engineer-stats", "/engineer/changelog"]
+  const userRoutes = ["/user"]
 
   // Rutas comunes que todos los roles pueden acceder
-  const commonRoutes = [
-    "/api/tickets",
-    "/api/tickets/submit",
-    "/api/engineers/team-stats",
-    "/api/engineers/detailed-stats",
-    "/api/changelog",
-  ]
+  const commonRoutes = ["/api/tickets", "/api/tickets/submit"]
 
   const path = request.nextUrl.pathname
+
+  // Explicitly block removed routes
+  const blockedRoutes = [
+    "/register",
+    "/admin/pending-registrations",
+    "/admin/xp-management",
+    "/admin/changelog",
+    "/dashboard/extra-time",
+    "/dashboard/extra-time/requests",
+    "/user/extra-time",
+    "/user/extra-time/requests",
+    "/user/changelog",
+    "/dashboard/changelog",
+  ]
+
+  // Block access to removed routes
+  if (blockedRoutes.some((route) => path === route || path.startsWith(route))) {
+    return NextResponse.redirect(new URL("/", request.url))
+  }
+
+  // Special handling for engineer stats - only engineers can access
+  if (path === "/dashboard/engineer-stats" && userRole !== "ingeniero") {
+    return NextResponse.redirect(new URL("/", request.url))
+  }
 
   // Si no está autenticado y no es una ruta pública, redirigir al login
   if (!isAuthenticated && !publicRoutes.some((route) => path === route || path.startsWith(route))) {
@@ -76,7 +81,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/engineer", request.url))
     }
 
-    // Usuarios regulares (supervisores y gerentes) pueden acceder a rutas de usuario y algunas rutas de dashboard
+    // Usuarios regulares (supervisores y gerentes) pueden acceder a rutas de usuario
     if (
       (userRole === "supervisor" || userRole === "gerente") &&
       !userRoutes.some((route) => path === route || path.startsWith(route))

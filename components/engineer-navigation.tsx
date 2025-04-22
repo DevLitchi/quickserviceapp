@@ -3,13 +3,12 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { ClipboardList, User, FileText, Settings, BarChart } from "lucide-react"
+import { ClipboardList, User, Settings, BarChart } from "lucide-react"
 
 const links = [
   { href: "/engineer/dashboard", label: "Gestión de Tickets", icon: ClipboardList },
   { href: "/engineer/profile", label: "Perfil", icon: User },
   { href: "/dashboard/engineer-stats", label: "Estadísticas", icon: BarChart },
-  { href: "/engineer/changelog", label: "Changelog", icon: FileText },
   { href: "/engineer/settings", label: "Configuración", icon: Settings },
 ]
 

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LogOut, Ticket, ClipboardList, Users, Clock, User, BarChart2, FileText } from "lucide-react"
+import { LogOut, Ticket, ClipboardList, Users, User, BarChart2 } from "lucide-react"
 import { logout, getUserRole } from "@/lib/auth"
 import { useEffect, useState } from "react"
 
@@ -73,19 +73,6 @@ export default function DashboardHeader() {
           <Link href="/dashboard" className="flex items-center space-x-1 text-gray-700 hover:text-primary">
             <ClipboardList className="h-5 w-5" />
             <span className="hidden md:inline">Tickets</span>
-          </Link>
-
-          <Link href="/dashboard/changelog" className="flex items-center space-x-1 text-gray-700 hover:text-primary">
-            <FileText className="h-5 w-5" />
-            <span className="hidden md:inline">Changelog</span>
-          </Link>
-
-          <Link
-            href="/dashboard/extra-time/requests"
-            className="flex items-center space-x-1 text-gray-700 hover:text-primary"
-          >
-            <Clock className="h-5 w-5" />
-            <span className="hidden md:inline">Extra Time</span>
           </Link>
 
           {(userRole === "admin" || userRole === "gerente") && (
