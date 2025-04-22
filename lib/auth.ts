@@ -166,12 +166,6 @@ export async function getUserName(): Promise<string | null> {
   return nameCookie?.value || null
 }
 
-// Add the getUserId function after the getUserName function
-export async function getUserId(): Promise<string | null> {
-  const userIdCookie = cookies().get("userId")
-  return userIdCookie?.value || null
-}
-
 export async function logout(): Promise<void> {
   cookies().delete("auth")
   cookies().delete("userId")

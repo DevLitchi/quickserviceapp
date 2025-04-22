@@ -1,14 +1,12 @@
 import { redirect } from "next/navigation"
-import { isAuthenticated, getUserRole } from "@/lib/auth"
+import { isAuthenticated } from "@/lib/auth"
 import DashboardHeader from "@/components/dashboard-header"
 import ChangelogManager from "@/components/changelog-manager"
 
-export default async function DashboardChangelogPage() {
+export default async function ChangelogPage() {
   const authenticated = await isAuthenticated()
-  const userRole = await getUserRole()
 
-  // Only allow admin and engineer roles to access this page
-  if (!authenticated || (userRole !== "admin" && userRole !== "ingeniero")) {
+  if (!authenticated) {
     redirect("/")
   }
 

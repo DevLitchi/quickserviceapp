@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ClipboardList, Users, Settings, FileText, LogOut } from "lucide-react"
+import { ClipboardList, Users, Clock, Settings, FileText, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logout, getUserRole } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -120,6 +120,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <FileText className="h-5 w-5" />
                 <span>Changelog</span>
               </Link>
+              <Link
+                href="/dashboard/extra-time/requests"
+                className={cn(
+                  "flex items-center space-x-1 py-2 px-3 rounded-md transition-colors",
+                  pathname === "/dashboard/extra-time/requests"
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-gray-700 hover:text-primary hover:bg-gray-50",
+                )}
+              >
+                <Clock className="h-5 w-5" />
+                <span>Time Requests</span>
+              </Link>
               <Button variant="ghost" onClick={handleLogoutAction} className="flex items-center space-x-1 py-2 px-3">
                 <LogOut className="h-5 w-5" />
                 <span>Logout</span>
@@ -174,6 +186,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <FileText className="h-5 w-5" />
                 <span>Changelog</span>
+              </Link>
+              <Link
+                href="/dashboard/extra-time/requests"
+                className={cn(
+                  "flex items-center space-x-2 py-2 px-3 rounded-md",
+                  pathname === "/dashboard/extra-time/requests"
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-gray-700 hover:text-primary hover:bg-gray-50",
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Clock className="h-5 w-5" />
+                <span>Time Requests</span>
               </Link>
               <Button
                 variant="ghost"

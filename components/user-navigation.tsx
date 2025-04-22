@@ -8,9 +8,9 @@ const links = [
   { href: "/user", label: "Panel Principal" },
   { href: "/user/submit-ticket", label: "Crear Ticket" },
   { href: "/user/view-tickets", label: "Mis Tickets" },
-  // Removed: { href: "/user/extra-time", label: "Tiempo Extra" },
-  // Removed: { href: "/user/changelog", label: "Changelog" },
-  // Removed: { href: "/dashboard/engineer-stats", label: "Estadísticas" },
+  { href: "/user/extra-time", label: "Tiempo Extra" },
+  { href: "/user/changelog", label: "Changelog" },
+  { href: "/dashboard/engineer-stats", label: "Estadísticas" },
   { href: "/user/settings", label: "Configuración" },
 ]
 

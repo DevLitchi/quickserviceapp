@@ -3,20 +3,29 @@ import { isAuthenticated, getUserRole } from "@/lib/auth"
 import DashboardHeader from "@/components/dashboard-header"
 import TeamStats from "@/components/team-stats"
 
-export default async function EngineerStatsPage() {
+export const metadata = {
+  title: "Estadísticas del Equipo de Ingenieros | SFQS",
+  description: "Estadísticas detalladas del rendimiento del equipo de ingenieros",
+}
+
+export default async function EngineerTeamStatsPage() {
   const authenticated = await isAuthenticated()
   const userRole = await getUserRole()
 
-  // Only allow engineers to access this page
-  if (!authenticated || userRole !== "ingeniero") {
-    redirect("/")
+  if (!authenticated) {
+    redirect("/login")
+  }
+
+  // Permitir acceso a administradores, gerentes e ingenieros
+  if (userRole !== "admin" && userRole !== "gerente" && userRole !== "ingeniero") {
+    redirect("/dashboard")
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader />
       <main className="container mx-auto py-6 px-4">
-        <h1 className="text-3xl font-bold mb-6">Engineer Statistics</h1>
+        <h1 className="text-3xl font-bold mb-6">Estadísticas del Equipo de Ingenieros</h1>
         <TeamStats />
       </main>
     </div>

@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ClipboardList, User, LogOut, FileText, Settings, BarChart2 } from "lucide-react"
+import { ClipboardList, User, Award, LogOut, FileText, Settings, BarChart2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logout, getUserRole, getUserEmail } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -74,7 +74,7 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
     }
   }, [pathname, userEmail])
 
-  // Updated navigation links with consolidated routes
+  // Actualizar el array de enlaces de navegación para incluir las estadísticas detalladas
   const navLinks = [
     {
       href: "/engineer/dashboard",
@@ -92,7 +92,7 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
       icon: BarChart2,
     },
     {
-      href: "/dashboard/changelog",
+      href: "/engineer/changelog",
       label: "Changelog",
       icon: FileText,
     },
@@ -121,7 +121,7 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <ClipboardList className="h-6 w-6 text-primary" aria-hidden="true" />
+              <Award className="h-6 w-6 text-primary" aria-hidden="true" />
               <span className="text-xl font-bold">SFQS Engineer Portal</span>
             </div>
 

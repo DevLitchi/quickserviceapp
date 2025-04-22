@@ -1,7 +1,5 @@
 "use client"
 
-import { useState } from "react"
-
 interface ToastProps {
   message: string
   type?: "success" | "error" | "info"
@@ -24,26 +22,4 @@ export function toast({ message, type = "info", duration = 3000 }: ToastProps) {
       document.body.removeChild(toastElement)
     }, 300)
   }, duration)
-}
-
-// Add the missing useToast hook
-export function useToast() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [toastData, setToastData] = useState<ToastProps | null>(null)
-
-  const showToast = (props: ToastProps) => {
-    setToastData(props)
-    setIsVisible(true)
-    toast(props)
-
-    setTimeout(() => {
-      setIsVisible(false)
-    }, props.duration || 3000)
-  }
-
-  return {
-    toast: showToast,
-    isVisible,
-    toastData,
-  }
 }
