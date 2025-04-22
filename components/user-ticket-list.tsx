@@ -58,8 +58,16 @@ export function UserTicketList({ area = "all", filter = "all" }: UserTicketListP
   }, [area, filter])
 
   const handleTicketClick = (ticket: Ticket) => {
-    setSelectedTicket(ticket)
-    setIsModalOpen(true)
+    try {
+      setSelectedTicket(ticket)
+      setIsModalOpen(true)
+    } catch (error) {
+      console.error("Error opening ticket details:", error)
+      toast({
+        message: "Error al abrir detalles del ticket. Por favor intente de nuevo.",
+        type: "error",
+      })
+    }
   }
 
   const handleConfirmResolution = async (ticketId: number, confirmed: boolean) => {

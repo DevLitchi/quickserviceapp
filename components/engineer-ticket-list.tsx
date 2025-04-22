@@ -358,7 +358,13 @@ export default function EngineerTicketList() {
   const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage)
 
   const paginate = (pageNumber: number) => {
-    setCurrentPage(pageNumber)
+    try {
+      setCurrentPage(pageNumber)
+      // Optionally scroll to top of list
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    } catch (error) {
+      console.error("Error changing page:", error)
+    }
   }
 
   return (
