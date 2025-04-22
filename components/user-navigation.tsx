@@ -8,7 +8,6 @@ const links = [
   { href: "/user", label: "Panel Principal" },
   { href: "/user/submit-ticket", label: "Crear Ticket" },
   { href: "/user/view-tickets", label: "Mis Tickets" },
-  { href: "/dashboard/engineer-stats", label: "Estadísticas" },
   { href: "/user/settings", label: "Configuración" },
 ]
 

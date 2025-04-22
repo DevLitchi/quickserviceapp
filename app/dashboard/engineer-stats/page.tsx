@@ -18,7 +18,7 @@ export default async function EngineerTeamStatsPage() {
 
   // Only engineers can access this page now
   if (userRole !== "ingeniero") {
-    redirect("/")
+    redirect("/restricted")
   }
 
   return (
