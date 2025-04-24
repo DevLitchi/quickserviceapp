@@ -21,11 +21,6 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return NextResponse.json({ success: false, message: "El aprobador es requerido" }, { status: 400 })
     }
 
-    // Prevent self-rejection
-    if (approvedBy === userEmail) {
-      return NextResponse.json({ success: false, message: "No puede rechazar su propio registro" }, { status: 403 })
-    }
-
     const success = await rejectUnregisteredSupportEntry(params.id, rejectionComment, approvedBy)
 
     if (success) {
@@ -36,12 +31,12 @@ export async function POST(request: Request, { params }: { params: { id: string 
         { status: 500 },
       )
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error al rechazar el registro de soporte:", error)
     return NextResponse.json(
       {
         success: false,
-        message: "Ocurrió un error al rechazar el registro de soporte: " + error.message,
+        message: "Ocurrió un error al rechazar el registro de soporte",
       },
       { status: 500 },
     )
