@@ -64,20 +64,20 @@ export async function GET(request: Request) {
     // Si se solicita una actualización, recalcular la experiencia total
     if (refresh) {
       // Calcular la experiencia total basada en los tickets resueltos
-      const totalExp =
+      let totalExp =
         highPriority * calculateTicketExperience("Alta") +
         mediumPriority * calculateTicketExperience("Media") +
         lowPriority * calculateTicketExperience("Baja")
 
       // Add XP for approved unregistered support entries (assuming each is worth 2 XP)
-      const totalExpWithUnregistered = totalExp + approvedUnregisteredSupport * 2
+      totalExp += approvedUnregisteredSupport * 2
 
       // Update the experience and ticketsSolved count in the database
       await usersCollection.updateOne(
         { email },
         {
           $set: {
-            exp: totalExpWithUnregistered,
+            exp: totalExp,
             ticketsSolved: solved + approvedUnregisteredSupport,
             ticketsPending: pending,
           },
@@ -85,7 +85,7 @@ export async function GET(request: Request) {
       )
 
       console.log(
-        `Experiencia actualizada para ${email}: ${totalExpWithUnregistered} EXP (${solved} tickets resueltos, ${approvedUnregisteredSupport} unregistered support entries)`,
+        `Experiencia actualizada para ${email}: ${totalExp} EXP (${solved} tickets resueltos, ${approvedUnregisteredSupport} unregistered support entries)`,
       )
     }
 

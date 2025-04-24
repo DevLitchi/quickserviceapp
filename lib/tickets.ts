@@ -66,25 +66,29 @@ export async function getTickets(
         isUnregisteredSupport: false, // Flag to identify regular tickets
       })),
       ...unregisteredSupportEntries.map((entry) => ({
-        ...entry,
         id: entry._id.toString(),
         supervisor: "N/A", // Or any default value
         area: entry.area,
         fixtura: entry.fixture,
         tipo: entry.supportType,
         otherDescription: entry.description,
-        prioridad: "N/A", // Or any default value
+        prioridad: "Media", // Or any default value
         fecha_creacion: new Date(entry.submittedAt).toLocaleString(),
-        estado: "Aprobado", // Or any appropriate status
+        estado: "Cerrado", // Or any appropriate status
         img: entry.evidence,
+        assignedTo: "N/A",
+        assignedToEmail: userEmail,
+        assignedAt: entry.submittedAt,
         createdAt: entry.submittedAt,
         createdBy: entry.submittedBy,
+        resolvedAt: entry.submittedAt,
         resolved: true,
         resolutionDetails: "Soporte no registrado aprobado",
         pendingUserConfirmation: false,
         comments: [],
         changelog: [],
         expAwarded: 0, // Or calculate if needed
+        supportedBy: "N/A",
         isUnregisteredSupport: true, // Flag to identify unregistered support entries
       })),
     ]
@@ -277,7 +281,7 @@ export async function resolveTicket(
 
     // Determinar la experiencia a otorgar basada en la prioridad
     const expAwarded = calculateTicketExperience(currentTicket.prioridad)
-    DebugLogger.log("resolveTicket", `XP to award: ${expAwarded} for ${currentTicket.prioridad} priority`)
+    DebugLogger.log("resolveTicket", `XP to award: ${expAwarded} for ticket with priority: ${currentTicket.prioridad}`)
 
     // Añadir el tiempo transcurrido al final de los detalles de resolución
     const resolutionWithTime = `${resolutionDetails}

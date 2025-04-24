@@ -135,6 +135,7 @@ export default function EngineerTicketList() {
     console.log("Filtered tickets:", result.length)
     setFilteredTickets(result)
     // Reset to first page when filters change
+    setCurrentPage(1)
   }, [tickets, searchQuery, priorityFilter, currentUser?.email])
 
   const handleTicketClick = (ticket: Ticket) => {
