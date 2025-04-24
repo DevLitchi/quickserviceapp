@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { getUserRole, getCurrentUser } from "@/lib/auth"
 import TicketDetailsModal from "./ticket-details-modal"
 import type { Ticket } from "@/lib/types"
-import { Loader2, AlertCircle, Search, Filter, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react"
+import { Loader2, AlertCircle, Search, Filter, RefreshCw, ChevronLeft, ChevronRight, HelpCircle } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -444,6 +444,12 @@ export default function EngineerTicketList() {
                     <div className="flex flex-col gap-1 items-end">
                       {getStatusBadge(ticket)}
                       <Badge className={getPriorityColor(ticket.prioridad)}>{ticket.prioridad}</Badge>
+                      {ticket.isUnregisteredSupport && (
+                        <Badge variant="secondary" className="bg-green-500 text-white">
+                          <HelpCircle className="h-3 w-3 mr-1" />
+                          Soporte No Registrado
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-between items-center mt-2">

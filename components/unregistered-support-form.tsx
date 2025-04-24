@@ -1,5 +1,9 @@
 "use client"
 
+import { AlertDescription } from "@/components/ui/alert"
+
+import { Alert } from "@/components/ui/alert"
+
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -11,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getCurrentUser } from "@/lib/auth"
 import { toast } from "@/components/ui/use-toast"
+import { CheckCircle, Loader2 } from "lucide-react"
 
 export default function UnregisteredSupportForm() {
   const [area, setArea] = useState("ACG")
@@ -20,6 +25,8 @@ export default function UnregisteredSupportForm() {
   const [evidence, setEvidence] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [submissionSuccess, setSubmissionSuccess] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -33,6 +40,8 @@ export default function UnregisteredSupportForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setFormError(null)
+    setSubmissionSuccess(false)
 
     try {
       if (!area || !fixture || !description || !supportType || !evidence) {
@@ -83,9 +92,26 @@ export default function UnregisteredSupportForm() {
         throw new Error(data.message || "Error al enviar el registro de soporte")
       }
 
-      router.push("/engineer/unregistered-support?success=true")
+      setSubmissionSuccess(true)
+      toast({
+        message: "Registro de soporte enviado correctamente",
+        type: "success",
+      })
+
+      // Reset form fields
+      setArea("ACG")
+      setFixture("")
+      setDescription("")
+      setSupportType("")
+      setEvidence(null)
+
+      // Redirect after a delay
+      setTimeout(() => {
+        router.push("/engineer/unregistered-support")
+      }, 2000)
     } catch (error: any) {
       console.error("Error al enviar registro de soporte:", error)
+      setFormError(error.message || "Error al enviar el registro de soporte. Por favor intente de nuevo.")
       toast({
         message: error.message || "Error al enviar el registro de soporte. Por favor intente de nuevo.",
         type: "error",
@@ -99,9 +125,22 @@ export default function UnregisteredSupportForm() {
     <Card>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+          {formError && (
+            <Alert variant="destructive">
+              <AlertDescription>{formError}</AlertDescription>
+            </Alert>
+          )}
+
+          {submissionSuccess && (
+            <Alert className="bg-green-100 border-green-200 text-green-700">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Registro de soporte enviado correctamente. Redirigiendo...
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="area">Área:</Label>
-            <Select value={area} onValueChange={setArea} required>
+            <Select value={area} onValueChange={setArea} required disabled={isSubmitting}>
               <SelectTrigger id="area">
                 <SelectValue placeholder="Seleccione área" />
               </SelectTrigger>
@@ -124,6 +163,7 @@ export default function UnregisteredSupportForm() {
               onChange={(e) => setFixture(e.target.value)}
               placeholder="Ingrese ID de fixture (ej. F-1001, ABC123)"
               required
+              disabled={isSubmitting}
             />
           </div>
 
@@ -136,12 +176,13 @@ export default function UnregisteredSupportForm() {
               placeholder="Describa la actividad de soporte en detalle"
               required
               rows={4}
+              disabled={isSubmitting}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="supportType">Tipo de Soporte:</Label>
-            <Select value={supportType} onValueChange={setSupportType} required>
+            <Select value={supportType} onValueChange={setSupportType} required disabled={isSubmitting}>
               <SelectTrigger id="supportType">
                 <SelectValue placeholder="Seleccione tipo de soporte" />
               </SelectTrigger>
@@ -167,11 +208,19 @@ export default function UnregisteredSupportForm() {
                 }
               }}
               required
+              disabled={isSubmitting}
             />
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Enviando..." : "Enviar Registro"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              "Enviar Registro"
+            )}
           </Button>
         </form>
       </CardContent>
