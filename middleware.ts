@@ -13,7 +13,13 @@ export function middleware(request: NextRequest) {
 
   // Rutas específicas por rol - Removed restricted routes
   const adminRoutes = ["/admin", "/dashboard", "/dashboard/users"]
-  const engineerRoutes = ["/engineer", "/engineer/stats", "/dashboard/engineer-stats", "/engineer/profile"]
+  const engineerRoutes = [
+    "/engineer",
+    "/engineer/stats",
+    "/dashboard/engineer-stats",
+    "/engineer/profile",
+    "/engineer/unregistered-support",
+  ]
   const userRoutes = ["/user"]
 
   // Rutas comunes que todos los roles pueden acceder

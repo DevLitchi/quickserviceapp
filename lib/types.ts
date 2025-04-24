@@ -108,3 +108,17 @@ export interface ExtraTimeRequest {
   comments?: string
   scheduledDate?: number // Nueva propiedad para la fecha programada
 }
+
+export interface UnregisteredSupport {
+  id: number
+  area: string
+  fixture: string
+  description: string
+  supportType: string
+  evidence: string // URL to the uploaded image
+  submittedBy: string
+  submittedAt: number
+  approved: boolean | null // null = pending, true = approved, false = rejected
+  approvedBy?: string
+  approvedAt?: number
+}
