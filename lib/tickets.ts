@@ -20,6 +20,7 @@ export async function getTickets(
 ): Promise<Ticket[]> {
   try {
     const ticketsCollection = await getCollection("tickets")
+    const unregisteredSupportCollection = await getCollection("unregisteredSupport")
 
     // Create query based on the selected filter
     const query: any = {}
@@ -47,30 +48,72 @@ export async function getTickets(
 
     console.log(`Found ${tickets.length} tickets matching query`)
 
-    return tickets.map((ticket) => ({
-      id: ticket._id.toString(),
-      supervisor: ticket.supervisor,
-      area: ticket.area,
-      fixtura: ticket.fixtura,
-      tipo: ticket.tipo,
-      otherDescription: ticket.otherDescription || "",
-      prioridad: ticket.prioridad,
-      fecha_creacion: ticket.fecha_creacion || new Date(ticket.createdAt).toLocaleString(),
-      estado: ticket.estado,
-      img: ticket.img,
-      assignedTo: ticket.assignedTo,
-      assignedToEmail: ticket.assignedToEmail,
-      assignedAt: ticket.assignedAt instanceof Date ? ticket.assignedAt.getTime() : ticket.assignedAt,
-      createdAt: ticket.createdAt instanceof Date ? ticket.createdAt.getTime() : ticket.createdAt,
-      createdBy: ticket.createdBy,
-      resolvedAt: ticket.resolvedAt instanceof Date ? ticket.resolvedAt.getTime() : ticket.resolvedAt,
-      resolved: ticket.resolved || false,
-      resolutionDetails: ticket.resolutionDetails,
-      pendingUserConfirmation: ticket.pendingUserConfirmation || false,
-      comments: ticket.comments || [],
-      changelog: ticket.changelog || [],
-      expAwarded: ticket.expAwarded || 0,
-      supportedBy: ticket.supportedBy,
+    // Fetch approved unregistered support entries for the user
+    const unregisteredSupportEntries = await unregisteredSupportCollection
+      .find({
+        submittedBy: userEmail,
+        approved: true,
+      })
+      .toArray()
+
+    console.log(`Found ${unregisteredSupportEntries.length} unregistered support entries for ${userEmail}`)
+
+    // Combine tickets and unregistered support entries
+    const combinedEntries = [
+      ...tickets.map((ticket) => ({
+        ...ticket,
+        id: ticket._id.toString(),
+        isUnregisteredSupport: false, // Flag to identify regular tickets
+      })),
+      ...unregisteredSupportEntries.map((entry) => ({
+        ...entry,
+        id: entry._id.toString(),
+        supervisor: "N/A", // Or any default value
+        area: entry.area,
+        fixtura: entry.fixture,
+        tipo: entry.supportType,
+        otherDescription: entry.description,
+        prioridad: "N/A", // Or any default value
+        fecha_creacion: new Date(entry.submittedAt).toLocaleString(),
+        estado: "Aprobado", // Or any appropriate status
+        img: entry.evidence,
+        createdAt: entry.submittedAt,
+        createdBy: entry.submittedBy,
+        resolved: true,
+        resolutionDetails: "Soporte no registrado aprobado",
+        pendingUserConfirmation: false,
+        comments: [],
+        changelog: [],
+        expAwarded: 0, // Or calculate if needed
+        isUnregisteredSupport: true, // Flag to identify unregistered support entries
+      })),
+    ]
+
+    return combinedEntries.map((entry: any) => ({
+      id: entry.id,
+      supervisor: entry.supervisor,
+      area: entry.area,
+      fixtura: entry.fixtura,
+      tipo: entry.tipo,
+      otherDescription: entry.otherDescription || "",
+      prioridad: entry.prioridad,
+      fecha_creacion: entry.fecha_creacion || new Date(entry.createdAt).toLocaleString(),
+      estado: entry.estado,
+      img: entry.img,
+      assignedTo: entry.assignedTo,
+      assignedToEmail: entry.assignedToEmail,
+      assignedAt: entry.assignedAt instanceof Date ? entry.assignedAt.getTime() : entry.assignedAt,
+      createdAt: entry.createdAt instanceof Date ? entry.createdAt.getTime() : entry.createdAt,
+      createdBy: entry.createdBy,
+      resolvedAt: entry.resolvedAt instanceof Date ? entry.resolvedAt.getTime() : entry.resolvedAt,
+      resolved: entry.resolved || false,
+      resolutionDetails: entry.resolutionDetails,
+      pendingUserConfirmation: entry.pendingUserConfirmation || false,
+      comments: entry.comments || [],
+      changelog: entry.changelog || [],
+      expAwarded: entry.expAwarded || 0,
+      supportedBy: entry.supportedBy,
+      isUnregisteredSupport: entry.isUnregisteredSupport || false,
     }))
   } catch (error) {
     console.error("Error al obtener tickets:", error)

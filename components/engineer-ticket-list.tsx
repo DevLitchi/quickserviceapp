@@ -135,7 +135,6 @@ export default function EngineerTicketList() {
     console.log("Filtered tickets:", result.length)
     setFilteredTickets(result)
     // Reset to first page when filters change
-    setCurrentPage(1)
   }, [tickets, searchQuery, priorityFilter, currentUser?.email])
 
   const handleTicketClick = (ticket: Ticket) => {
@@ -430,7 +429,7 @@ export default function EngineerTicketList() {
               {currentTickets.map((ticket) => (
                 <div
                   key={ticket.id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors relative"
                   onClick={() => handleTicketClick(ticket)}
                 >
                   <div className="flex justify-between items-start mb-2">

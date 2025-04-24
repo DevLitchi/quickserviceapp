@@ -21,6 +21,7 @@ export async function GET(request: Request) {
     }
 
     const ticketsCollection = await getCollection("tickets")
+    const unregisteredSupportCollection = await getCollection("unregisteredSupport")
     const usersCollection = await getCollection("users")
 
     // Tickets resueltos por el ingeniero
@@ -54,6 +55,12 @@ export async function GET(request: Request) {
       prioridad: "Baja",
     })
 
+    // Approved unregistered support entries
+    const approvedUnregisteredSupport = await unregisteredSupportCollection.countDocuments({
+      submittedBy: email,
+      approved: true,
+    })
+
     // Si se solicita una actualización, recalcular la experiencia total
     if (refresh) {
       // Calcular la experiencia total basada en los tickets resueltos
@@ -62,24 +69,29 @@ export async function GET(request: Request) {
         mediumPriority * calculateTicketExperience("Media") +
         lowPriority * calculateTicketExperience("Baja")
 
-      // Actualizar la experiencia y tickets resueltos en la base de datos
+      // Add XP for approved unregistered support entries (assuming each is worth 2 XP)
+      const totalExpWithUnregistered = totalExp + approvedUnregisteredSupport * 2
+
+      // Update the experience and ticketsSolved count in the database
       await usersCollection.updateOne(
         { email },
         {
           $set: {
-            exp: totalExp,
-            ticketsSolved: solved,
+            exp: totalExpWithUnregistered,
+            ticketsSolved: solved + approvedUnregisteredSupport,
             ticketsPending: pending,
           },
         },
       )
 
-      console.log(`Experiencia actualizada para ${email}: ${totalExp} EXP (${solved} tickets resueltos)`)
+      console.log(
+        `Experiencia actualizada para ${email}: ${totalExpWithUnregistered} EXP (${solved} tickets resueltos, ${approvedUnregisteredSupport} unregistered support entries)`,
+      )
     }
 
     return NextResponse.json({
       success: true,
-      solved,
+      solved: solved + approvedUnregisteredSupport,
       pending,
       highPriority,
       mediumPriority,
