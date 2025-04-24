@@ -19,6 +19,7 @@ export function middleware(request: NextRequest) {
     "/dashboard/engineer-stats",
     "/engineer/profile",
     "/engineer/unregistered-support",
+    "/engineer/unregistered-support/review",
   ]
   const userRoutes = ["/user"]
 

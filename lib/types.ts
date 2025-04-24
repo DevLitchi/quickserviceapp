@@ -121,4 +121,5 @@ export interface UnregisteredSupport {
   approved: boolean | null // null = pending, true = approved, false = rejected
   approvedBy?: string
   approvedAt?: number
+  rejectionComment?: string
 }

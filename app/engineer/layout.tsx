@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ClipboardList, User, Award, LogOut, FileText, Settings, BarChart2, HelpCircle } from "lucide-react"
+import { ClipboardList, User, Award, LogOut, FileText, Settings, BarChart2, HelpCircle, ListChecks } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logout, getUserRole, getUserEmail } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -95,6 +95,11 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
       href: "/engineer/unregistered-support",
       label: "Soporte No Registrado",
       icon: HelpCircle,
+    },
+    {
+      href: "/engineer/unregistered-support/review",
+      label: "Revisar Soporte",
+      icon: ListChecks,
     },
     {
       href: "/engineer/changelog",
