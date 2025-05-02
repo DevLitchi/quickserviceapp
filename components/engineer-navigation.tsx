@@ -19,14 +19,14 @@ export default function EngineerNavigation() {
   const pathname = usePathname()
 
   return (
-    <nav className="flex space-x-4">
+    <nav className="flex flex-col space-y-1">
       {links.map((link) => (
         <Link
           key={link.href}
           href={link.href}
           className={cn(
             "px-3 py-2 rounded-md text-sm font-medium flex items-center",
-            pathname === link.href ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white",
+            pathname === link.href ? "bg-primary text-white" : "text-gray-700 hover:bg-gray-100 hover:text-primary",
           )}
         >
           <link.icon className="h-4 w-4 mr-2" />

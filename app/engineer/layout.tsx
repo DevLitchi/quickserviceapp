@@ -5,7 +5,20 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ClipboardList, User, Award, LogOut, FileText, Settings, BarChart2, HelpCircle, ListChecks } from "lucide-react"
+import {
+  ClipboardList,
+  User,
+  Award,
+  LogOut,
+  FileText,
+  Settings,
+  BarChart2,
+  HelpCircle,
+  ListChecks,
+  Menu,
+  X,
+  ChevronRight,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logout, getUserRole, getUserEmail } from "@/lib/auth"
 import { cn } from "@/lib/utils"
@@ -13,7 +26,8 @@ import { cn } from "@/lib/utils"
 export default function EngineerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -42,9 +56,24 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
       }
     }
 
+    // Check if we're on mobile and close sidebar by default
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false)
+      } else {
+        setIsSidebarOpen(true)
+      }
+    }
+
     checkUserRole()
+    handleResize() // Call once on initial load
     window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("resize", handleResize)
+    }
   }, [router])
 
   // Set up auto-refresh for dbasilio@milwaukeeelectronics.com on dashboard page
@@ -124,130 +153,141 @@ export default function EngineerLayout({ children }: { children: React.ReactNode
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header
-        className={cn("sticky top-0 z-50 bg-white transition-shadow duration-200", isScrolled ? "shadow-md" : "shadow")}
+    <div className="flex h-screen bg-gray-50">
+      {/* Mobile sidebar backdrop */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setIsMobileSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out transform md:relative md:translate-x-0",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:w-20",
+          isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        )}
       >
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Award className="h-6 w-6 text-primary" aria-hidden="true" />
-              <span className="text-xl font-bold">SFQS Engineer Portal</span>
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              className="md:hidden p-2 rounded-md hover:bg-gray-100"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-menu"
-              aria-label="Toggle navigation menu"
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-                />
-              </svg>
-            </button>
-
-            {/* Desktop navigation */}
-            <nav className="hidden md:block">
-              <ul className="flex space-x-6">
-                {navLinks.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={cn(
-                        "flex items-center space-x-1 py-2 px-3 rounded-md transition-colors",
-                        pathname === link.href
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                      )}
-                      aria-current={pathname === link.href ? "page" : undefined}
-                    >
-                      <link.icon className="h-5 w-5" aria-hidden="true" />
-                      <span>{link.label}</span>
-                    </Link>
-                  </li>
-                ))}
-                <li>
-                  <Button
-                    variant="ghost"
-                    onClick={handleLogoutAction}
-                    className="flex items-center space-x-1 py-2 px-3"
-                  >
-                    <LogOut className="h-5 w-5" aria-hidden="true" />
-                    <span>Logout</span>
-                  </Button>
-                </li>
-              </ul>
-            </nav>
+        {/* Sidebar header */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+          <div className="flex items-center">
+            <Award className="h-8 w-8 text-primary" aria-hidden="true" />
+            {isSidebarOpen && <span className="ml-3 text-xl font-bold">SFQS Engineer</span>}
           </div>
-
-          {/* Mobile navigation */}
-          <div
-            id="mobile-menu"
-            className={cn(
-              "md:hidden transition-all duration-300 ease-in-out overflow-hidden",
-              isMobileMenuOpen ? "max-h-64 mt-4" : "max-h-0",
-            )}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-1 rounded-md text-gray-500 hover:bg-gray-100 hidden md:block"
+            aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
-            <nav className="flex flex-col space-y-2 pb-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "flex items-center space-x-2 py-2 px-3 rounded-md",
-                    pathname === link.href
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  aria-current={pathname === link.href ? "page" : undefined}
-                >
-                  <link.icon className="h-5 w-5" aria-hidden="true" />
-                  <span>{link.label}</span>
-                </Link>
-              ))}
-              <Button
-                variant="ghost"
-                onClick={handleLogoutAction}
-                className="flex items-center justify-start space-x-2 py-2 px-3 w-full text-left"
+            <ChevronRight className={cn("h-5 w-5 transition-transform", !isSidebarOpen && "rotate-180")} />
+          </button>
+          <button
+            onClick={() => setIsMobileSidebarOpen(false)}
+            className="p-1 rounded-md text-gray-500 hover:bg-gray-100 md:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Sidebar content */}
+        <div className="py-4 flex flex-col h-[calc(100%-4rem)] justify-between">
+          <nav className="space-y-1 px-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "group flex items-center px-2 py-3 text-sm font-medium rounded-md transition-colors",
+                  pathname === link.href
+                    ? "bg-primary text-white"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-primary",
+                )}
+                aria-current={pathname === link.href ? "page" : undefined}
               >
-                <LogOut className="h-5 w-5" aria-hidden="true" />
-                <span>Logout</span>
-              </Button>
-            </nav>
+                <link.icon
+                  className={cn(
+                    "h-5 w-5 mr-3 flex-shrink-0",
+                    pathname === link.href ? "text-white" : "text-gray-500 group-hover:text-primary",
+                  )}
+                  aria-hidden="true"
+                />
+                {(isSidebarOpen || isMobileSidebarOpen) && <span>{link.label}</span>}
+                {!isSidebarOpen && !isMobileSidebarOpen && <span className="sr-only">{link.label}</span>}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="px-2 mt-auto">
+            <Button
+              variant="ghost"
+              onClick={handleLogoutAction}
+              className={cn(
+                "w-full justify-start text-gray-700 hover:bg-gray-100 hover:text-primary",
+                !isSidebarOpen && !isMobileSidebarOpen && "justify-center",
+              )}
+            >
+              <LogOut className="h-5 w-5 flex-shrink-0 mr-3" aria-hidden="true" />
+              {(isSidebarOpen || isMobileSidebarOpen) && <span>Cerrar sesión</span>}
+              {!isSidebarOpen && !isMobileSidebarOpen && <span className="sr-only">Cerrar sesión</span>}
+            </Button>
           </div>
         </div>
-      </header>
-      <main className="flex-1">{children}</main>
-      <footer className="bg-white border-t py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-sm text-gray-600">
-                &copy; {new Date().getFullYear()} SFQS Ticket System. Todos los derechos reservados.
-              </p>
-            </div>
-            <div className="flex space-x-4">
-              <Link href="/engineer/help" className="text-sm text-gray-600 hover:text-primary">
-                Ayuda
-              </Link>
-              <Link href="/engineer/terms" className="text-sm text-gray-600 hover:text-primary">
-                Términos
-              </Link>
-              <Link href="/engineer/privacy" className="text-sm text-gray-600 hover:text-primary">
-                Privacidad
-              </Link>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <header
+          className={cn(
+            "bg-white py-2 px-4 flex items-center justify-between border-b border-gray-200 transition-shadow",
+            isScrolled ? "shadow-md" : "",
+          )}
+        >
+          <button
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="p-2 rounded-md text-gray-500 hover:bg-gray-100 md:hidden"
+            aria-label="Open sidebar"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+          <div className="text-lg font-semibold ml-2 md:ml-0">
+            {/* Dynamic page title based on current path */}
+            {navLinks.find((link) => link.href === pathname)?.label || "Panel de Ingeniero"}
+          </div>
+          <div className="flex items-center space-x-2">
+            {userEmail && <span className="text-sm text-gray-500 hidden md:block">{userEmail}</span>}
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-auto bg-gray-50 p-4">
+          <div className="container mx-auto">{children}</div>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-white border-t py-4 px-4">
+          <div className="container mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="mb-4 md:mb-0">
+                <p className="text-sm text-gray-600">
+                  &copy; {new Date().getFullYear()} SFQS Ticket System. Todos los derechos reservados.
+                </p>
+              </div>
+              <div className="flex space-x-4">
+                <Link href="/engineer/help" className="text-sm text-gray-600 hover:text-primary">
+                  Ayuda
+                </Link>
+                <Link href="/engineer/terms" className="text-sm text-gray-600 hover:text-primary">
+                  Términos
+                </Link>
+                <Link href="/engineer/privacy" className="text-sm text-gray-600 hover:text-primary">
+                  Privacidad
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   )
 }
