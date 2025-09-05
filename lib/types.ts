@@ -85,7 +85,7 @@ export interface User {
   avatar?: string // URL del avatar
 }
 
-export type UserRole = "admin" | "gerente" | "supervisor" | "ingeniero"
+export type UserRole = "admin" | "supervisor" | "ingeniero"
 
 export interface UserLevel {
   level: number

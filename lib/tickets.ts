@@ -42,11 +42,9 @@ export async function getTickets(
       query.area = area
     }
 
-    console.log("MongoDB Query:", JSON.stringify(query), "Role:", role, "Filter:", filter)
 
     const tickets = await ticketsCollection.find(query).sort({ createdAt: -1 }).toArray()
 
-    console.log(`Found ${tickets.length} tickets matching query`)
 
     // Fetch approved unregistered support entries for the user
     const unregisteredSupportEntries = await unregisteredSupportCollection
@@ -56,7 +54,6 @@ export async function getTickets(
       })
       .toArray()
 
-    console.log(`Found ${unregisteredSupportEntries.length} unregistered support entries for ${userEmail}`)
 
     // Combine tickets and unregistered support entries
     const combinedEntries = [
@@ -574,7 +571,6 @@ export async function closeTicket(ticketId: string, changelogEntry: string): Pro
     // Determine the next changelog ID
     const nextChangelogId = currentTicket.changelog ? currentTicket.changelog.length + 1 : 1
 
-    console.log(`Cerrando ticket ${ticketId}, estado actual:`, currentTicket.estado)
 
     const result = await ticketsCollection.updateOne(
       { _id: id },
@@ -595,7 +591,6 @@ export async function closeTicket(ticketId: string, changelogEntry: string): Pro
       },
     )
 
-    console.log(`Ticket ${ticketId} cerrado, resultado:`, result.modifiedCount > 0 ? "éxito" : "fallo")
     return result.modifiedCount > 0
   } catch (error) {
     console.error(`Error al cerrar ticket ${ticketId}:`, error)

@@ -9,14 +9,14 @@ import { logout } from "@/lib/auth"
 
 const navLinks = [
   {
+    href: "/engineer/dashboard",
+    label: "Ver Tickets",
+    icon: ClipboardList,
+  },
+  {
     href: "/engineer/unregistered-support",
     label: "Registrar Soporte",
     icon: HelpCircle,
-  },
-  {
-    href: "/engineer/configuracion",
-    label: "Configuración",
-    icon: Settings,
   },
   {
     href: "/engineer/inventariado",
@@ -24,9 +24,9 @@ const navLinks = [
     icon: FileText,
   },
   {
-    href: "/engineer/dashboard",
-    label: "Ver Tickets",
-    icon: ClipboardList,
+    href: "/engineer/configuracion",
+    label: "Configuración",
+    icon: Settings,
   },
 ]
 

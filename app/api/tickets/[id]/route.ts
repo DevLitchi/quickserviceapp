@@ -43,8 +43,6 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const userRole = await getUserRole()
     const userEmail = await getUserEmail()
 
-    console.log(`Acción en ticket ${params.id}:`, action, data)
-    console.log(`Usuario con rol ${userRole} (${userEmail}) intentando realizar acción ${action}`)
 
     // Verificar permisos según la acción
     if (action === "assign" && userRole !== "admin" && userRole !== "ingeniero") {

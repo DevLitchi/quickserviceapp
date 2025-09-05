@@ -74,7 +74,6 @@ export default function SubmitTicketForm() {
           : [],
       }
 
-      console.log("Enviando datos de ticket:", ticketData)
 
       // Enviar datos a la API
       const response = await fetch("/api/tickets/submit", {

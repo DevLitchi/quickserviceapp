@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import EngineerTopNavigation from "@/components/engineer-top-navigation"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Package, Cable, Monitor } from "lucide-react"
+import { Package, Monitor, Wrench, Zap, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
 export default function InventariadoPage() {
@@ -47,7 +47,9 @@ export default function InventariadoPage() {
         <EngineerTopNavigation />
         <div className="container mx-auto py-6 px-4">
           <Skeleton className="h-8 w-64 mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-6xl mx-auto">
+            <Skeleton className="h-[200px] w-full rounded-lg" />
+            <Skeleton className="h-[200px] w-full rounded-lg" />
             <Skeleton className="h-[200px] w-full rounded-lg" />
             <Skeleton className="h-[200px] w-full rounded-lg" />
             <Skeleton className="h-[200px] w-full rounded-lg" />
@@ -59,6 +61,15 @@ export default function InventariadoPage() {
 
   const inventarioOptions = [
     {
+      id: "fixturas",
+      title: "FIXTURAS",
+      description: "Gestión de inventario de fixturas de prueba",
+      icon: Wrench,
+      href: "/engineer/inventariado/fixturas",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+    },
+    {
       id: "cyclone",
       title: "CYCLONE",
       description: "Gestión de inventario de equipos Cyclone",
@@ -68,22 +79,31 @@ export default function InventariadoPage() {
       bgColor: "bg-blue-50",
     },
     {
-      id: "cables-harnesses",
-      title: "CABLES Y ARNESES",
-      description: "Gestión de inventario de cables y arneses",
-      icon: Cable,
-      href: "/engineer/inventariado/cables-harnesses",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
       id: "desktops-pruebas",
-      title: "DESKTOPS DE PRUEBAS",
+      title: "DESKTOPS",
       description: "Gestión de inventario de desktops de pruebas",
       icon: Monitor,
       href: "/engineer/inventariado/desktops-pruebas",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
+    },
+    {
+      id: "pines-funcional",
+      title: "PINES FUNCIONAL",
+      description: "Gestión de inventario de pines funcionales",
+      icon: Zap,
+      href: "/engineer/inventariado/pines-funcional",
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50",
+    },
+    {
+      id: "pines-checksum",
+      title: "PINES CHECKSUM",
+      description: "Gestión de inventario de pines checksum",
+      icon: CheckCircle,
+      href: "/engineer/inventariado/pines-checksum",
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
     },
   ]
 
@@ -96,7 +116,7 @@ export default function InventariadoPage() {
           <p className="text-gray-600">Selecciona el tipo de inventario que deseas gestionar</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-6xl mx-auto">
           {inventarioOptions.map((option) => (
             <Card key={option.id} className="hover:shadow-lg transition-shadow duration-200">
               <CardHeader className="text-center">
@@ -111,7 +131,7 @@ export default function InventariadoPage() {
               <CardContent className="text-center">
                 <Button asChild className="w-full">
                   <Link href={option.href}>
-                    Gestionar {option.title}
+                    Gestionar
                   </Link>
                 </Button>
               </CardContent>

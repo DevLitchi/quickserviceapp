@@ -54,7 +54,6 @@ export default function TicketList() {
 
         const data = await response.json()
 
-        console.log("Admin tickets received:", data.tickets ? data.tickets.length : 0)
 
         if (data.tickets) {
           setTickets(data.tickets)
@@ -152,7 +151,6 @@ export default function TicketList() {
 
   const handleCloseTicket = async (ticketId: number, changelogEntry: string) => {
     try {
-      console.log("Closing ticket:", ticketId, "with entry:", changelogEntry)
 
       const response = await fetch(`/api/tickets/${ticketId}`, {
         method: "POST",

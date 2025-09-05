@@ -239,7 +239,6 @@ export default function TeamStats() {
       setError(null)
       setResponseData(null)
 
-      console.log(`Fetching stats for period: ${period}`)
       const response = await fetch(`/api/engineers/team-stats?period=${period}`)
 
       if (!response.ok) {
@@ -247,7 +246,6 @@ export default function TeamStats() {
       }
 
       const data = await response.json()
-      console.log("Stats data received:", data)
 
       // Guardar los datos de respuesta para depuración
       setResponseData(JSON.stringify(data, null, 2))

@@ -25,7 +25,6 @@ function formatElapsedTime(ms: number): string {
 
 export async function GET(request: Request) {
   try {
-    console.log("Iniciando obtención de estadísticas del equipo")
 
     // Modificar la parte donde se calcula la fecha de inicio según el período
     const { searchParams } = new URL(request.url)
@@ -49,7 +48,6 @@ export async function GET(request: Request) {
       startDate.setFullYear(startDate.getFullYear() - 1)
     }
 
-    console.log(`Período seleccionado: ${period}, fecha de inicio: ${startDate.toISOString()}`)
 
     // Obtener colecciones
     const usersCollection = await getCollection("users")
@@ -57,7 +55,6 @@ export async function GET(request: Request) {
 
     // Obtener todos los ingenieros
     const engineers = await usersCollection.find({ role: "ingeniero" }).toArray()
-    console.log(`Encontrados ${engineers.length} ingenieros`)
 
     // Estadísticas del equipo
     const teamStats = {
@@ -82,7 +79,6 @@ export async function GET(request: Request) {
       })
       .toArray()
 
-    console.log(`Encontrados ${openTickets.length} tickets abiertos`)
 
     // Calcular tiempo promedio de inactividad (test down time)
     if (openTickets.length > 0) {
@@ -103,7 +99,6 @@ export async function GET(request: Request) {
 
     // Procesar estadísticas para cada ingeniero
     for (const engineer of engineers) {
-      console.log(`Procesando estadísticas para ingeniero: ${engineer.name}`)
 
       // Obtener tickets resueltos por este ingeniero en el período seleccionado
       // IMPORTANTE: Modificamos la consulta para manejar diferentes formatos de fecha
@@ -122,7 +117,6 @@ export async function GET(request: Request) {
         })
         .toArray()
 
-      console.log(`Encontrados ${resolvedTickets.length} tickets resueltos para ${engineer.name}`)
 
       // Obtener tickets actualmente asignados a este ingeniero
       const assignedTickets = await ticketsCollection
@@ -132,7 +126,6 @@ export async function GET(request: Request) {
         })
         .toArray()
 
-      console.log(`Encontrados ${assignedTickets.length} tickets asignados para ${engineer.name}`)
 
       // Calcular tiempo promedio de resolución
       let totalResolutionTime = 0
@@ -234,7 +227,6 @@ export async function GET(request: Request) {
         })
         .toArray()
 
-      console.log(`Encontrados ${weeklyTickets.length} tickets para la tendencia semanal`)
 
       weeklyTickets.forEach((ticket) => {
         const resolvedAt = getTimestamp(ticket.resolvedAt)
@@ -252,7 +244,6 @@ export async function GET(request: Request) {
     // Añadir estadísticas de administrador
     const adminStats = await getAdminStats(ticketsCollection, startDate)
 
-    console.log("Estadísticas generadas correctamente")
 
     // Incluir los datos de tendencia semanal y estadísticas de administrador en la respuesta
     return NextResponse.json({

@@ -9,7 +9,6 @@ export async function GET(request: Request) {
     const filter = searchParams.get("filter") || "all"
     const debug = searchParams.get("debug") === "true"
 
-    console.log("API Request - area:", area, "filter:", filter, "user role:", await getUserRole())
 
     const role = await getUserRole()
     const userEmail = await getUserEmail()
@@ -20,11 +19,9 @@ export async function GET(request: Request) {
     // Usar el área de la consulta si se proporciona, pero no restringir por área del usuario
     const areaToUse = area || "all"
 
-    console.log("Using area:", areaToUse, "User role:", role, "User email:", userEmail)
 
     const tickets = await getTickets(areaToUse !== "all" ? areaToUse : undefined, filter, role, userEmail)
 
-    console.log(`Returning ${tickets.length} tickets to client`)
 
     if (debug) {
       return NextResponse.json({

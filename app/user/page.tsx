@@ -2,116 +2,88 @@ import { CardFooter } from "@/components/ui/card"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { PlusCircle, Search, Clock, FileText, Settings } from "lucide-react"
+import { PlusCircle, Search } from "lucide-react"
+import { getCurrentUser } from "@/lib/auth"
 
-export default function UserHomePage() {
+export default async function UserHomePage() {
+  const currentUser = await getCurrentUser()
+  const userName = currentUser?.name || "Usuario"
+
   return (
-    <div className="container mx-auto py-12 px-4">
-      <div className="max-w-4xl mx-auto text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">SFQS Ticket System</h1>
-        <p className="text-xl text-gray-600">Submit and track support tickets for fixtures and systems</p>
-      </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <main className="flex-1">
+        <div className="container mx-auto py-12 px-4">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h1 className="text-4xl font-bold mb-2">Panel de </h1>
+            <p className="text-2xl text-primary font-semibold mb-4">- {userName} -</p>
+            <p className="text-xl text-gray-600">Envía y gestiona tickets de soporte</p>
+          </div>
 
-      <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PlusCircle className="h-5 w-5 text-primary" />
-              Submit a Ticket
-            </CardTitle>
-            <CardDescription>Report an issue with a fixture or system</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">
-              Create a new support ticket to report problems with fixtures, system blockages, functional issues, or
-              other concerns.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild className="w-full">
-              <Link href="/user/submit-ticket">Submit Ticket</Link>
-            </Button>
-          </CardFooter>
-        </Card>
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <Card className="flex flex-col h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PlusCircle className="h-5 w-5 text-primary" aria-hidden="true" />
+                  Crear Ticket
+                </CardTitle>
+                <CardDescription>Reporta un problema con una fixtura o sistema</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-gray-600">
+                  Crea un nuevo ticket de soporte para reportar problemas con fixturas, bloqueos del sistema, problemas funcionales u otras preocupaciones.
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-gray-600 list-disc list-inside">
+                  <li>Reporta problemas con fixturas</li>
+                  <li>Notifica bloqueos del sistema</li>
+                  <li>Describe problemas funcionales</li>
+                  <li>Adjunta evidencia si es necesario</li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button asChild className="w-full">
+                  <Link href="/user/submit-ticket">
+                    <span className="flex items-center justify-center gap-2">
+                      <PlusCircle className="h-4 w-4" aria-hidden="true" />
+                      Crear Ticket
+                    </span>
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5 text-primary" />
-              View Tickets
-            </CardTitle>
-            <CardDescription>Check the status of existing tickets</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">
-              View all open tickets for your area, check their status, see assigned personnel, and track resolution
-              progress.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/user/view-tickets">View Tickets</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
-              Request Extra Time
-            </CardTitle>
-            <CardDescription>Request additional time with a technician</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">
-              Need more time with a technician? Submit a request for extra time and track its approval status.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/user/extra-time">Request Time</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              Changelog
-            </CardTitle>
-            <CardDescription>Administra las entradas del changelog</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">
-              Crea y gestiona entradas de changelog para informar a los usuarios sobre actualizaciones y cambios en el
-              sistema.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/user/changelog">Ver Changelog</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-primary" />
-              Configuración
-            </CardTitle>
-            <CardDescription>Administra la configuración de tu cuenta</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">Cambia tu contraseña y administra la configuración de tu cuenta.</p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/user/settings">Ver Configuración</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+            <Card className="flex flex-col h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5 text-primary" aria-hidden="true" />
+                  Ver Tickets
+                </CardTitle>
+                <CardDescription>Revisa el estado de tus tickets existentes</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-gray-600">
+                  Visualiza todos los tickets abiertos de tu área, revisa su estado, ve el personal asignado y rastrea el progreso de resolución.
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-gray-600 list-disc list-inside">
+                  <li>Revisa el estado de tus tickets</li>
+                  <li>Ve el personal asignado</li>
+                  <li>Rastrea el progreso de resolución</li>
+                  <li>Recibe actualizaciones en tiempo real</li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/user/view-tickets">
+                    <span className="flex items-center justify-center gap-2">
+                      <Search className="h-4 w-4" aria-hidden="true" />
+                      Consultar Tickets
+                    </span>
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }

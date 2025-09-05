@@ -85,16 +85,8 @@ export default function EngineerDashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <EngineerTopNavigation />
       <div className="container mx-auto py-6 px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold">Dashboard de Ingeniero</h1>
-          <div className="flex items-center bg-white px-4 py-2 rounded-lg shadow-sm">
-            <div className="flex items-center">
-              <div className="w-2 h-2 rounded-full bg-green-500 mr-2" aria-hidden="true"></div>
-              <span className="text-sm font-medium">
-                Nivel {engineerData.level} | {engineerData.exp} EXP
-              </span>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

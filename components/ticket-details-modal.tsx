@@ -21,7 +21,7 @@ interface TicketDetailsModalProps {
   onCloseTicket: (ticketId: number, changelogEntry: string) => void
   onAssignTicket?: (ticketId: number) => void
   onAddComment?: (ticketId: number, comment: string) => void
-  onMarkAsResolved?: (ticketId: number, resolutionDetails: string, supportedBy?: string) => void
+  onMarkAsResolved?: (ticketId: number, resolutionDetails: string) => void
   userRole?: string | null
   currentUser?: any
   showFixturaField?: boolean
@@ -44,38 +44,13 @@ export default function TicketDetailsModal({
   const [commentText, setCommentText] = useState("")
   const [resolutionDetails, setResolutionDetails] = useState("")
   const [fixturaField, setFixturaField] = useState(ticket.fixtura || "")
-  const [supportedBy, setSupportedBy] = useState("")
-  const [engineers, setEngineers] = useState<User[]>([])
+  const [diagnostico, setDiagnostico] = useState("")
+  const [pathFileReporte, setPathFileReporte] = useState("")
   const [isClosing, setIsClosing] = useState(false)
   const [isAssigning, setIsAssigning] = useState(false)
   const [isResolving, setIsResolving] = useState(false)
   const [isCommenting, setIsCommenting] = useState(false)
-  const [isLoadingEngineers, setIsLoadingEngineers] = useState(false)
 
-  // Cargar ingenieros para el campo "Soporte de:"
-  useEffect(() => {
-    const fetchEngineers = async () => {
-      if (userRole === "ingeniero" || userRole === "admin") {
-        try {
-          setIsLoadingEngineers(true)
-          const response = await fetch("/api/users?role=ingeniero")
-          if (response.ok) {
-            const data = await response.json()
-            if (data.users) {
-              // Filtrar para no incluir al usuario actual
-              setEngineers(data.users.filter((eng: User) => eng.email !== currentUser?.email))
-            }
-          }
-        } catch (error) {
-          console.error("Error al cargar ingenieros:", error)
-        } finally {
-          setIsLoadingEngineers(false)
-        }
-      }
-    }
-
-    fetchEngineers()
-  }, [userRole, currentUser?.email])
 
   // Check if the current user is the assigned engineer
   const isAssignedToMe = ticket.assignedToEmail === currentUser?.email
@@ -159,14 +134,21 @@ export default function TicketDetailsModal({
 ${finalResolutionDetails}`
       }
 
-      // Add support information if provided
-      if (supportedBy) {
+      // Add diagnostico information if provided
+      if (diagnostico.trim()) {
         finalResolutionDetails = `${finalResolutionDetails}
 
-Soporte de: ${supportedBy}`
+Diagnóstico: ${diagnostico}`
       }
 
-      await onMarkAsResolved(ticket.id, finalResolutionDetails, supportedBy)
+      // Add path file reporte information if provided
+      if (pathFileReporte.trim()) {
+        finalResolutionDetails = `${finalResolutionDetails}
+
+Path file reporte: ${pathFileReporte}`
+      }
+
+      await onMarkAsResolved(ticket.id, finalResolutionDetails)
     } finally {
       setIsResolving(false)
       setActiveTab("report")
@@ -374,29 +356,17 @@ Soporte de: ${supportedBy}`
 
                 {(userRole === "admin" || userRole === "ingeniero") && (
                   <div>
-                    <Label htmlFor="supported-by">Soporte de (opcional)</Label>
-                    {isLoadingEngineers ? (
-                      <div className="flex items-center mt-1">
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        <span className="text-sm">Cargando ingenieros...</span>
-                      </div>
-                    ) : (
-                      <Select value={supportedBy} onValueChange={setSupportedBy}>
-                        <SelectTrigger id="supported-by">
-                          <SelectValue placeholder="Seleccione si recibió ayuda" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Ninguno</SelectItem>
-                          {engineers.map((engineer) => (
-                            <SelectItem key={engineer.id} value={engineer.name}>
-                              {engineer.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
+                    <Label htmlFor="diagnostico">Diagnóstico</Label>
+                    <Textarea
+                      id="diagnostico"
+                      placeholder="Ingrese el diagnóstico del problema que partió para resolver el ticket"
+                      value={diagnostico}
+                      onChange={(e) => setDiagnostico(e.target.value)}
+                      className="mt-1"
+                      rows={3}
+                    />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Seleccione si otro ingeniero le ayudó a resolver este ticket
+                      Describa el diagnóstico inicial del problema
                     </p>
                   </div>
                 )}
@@ -416,6 +386,22 @@ Soporte de: ${supportedBy}`
                     <p className="text-xs text-orange-500 mt-1">No tiene permisos para resolver este ticket.</p>
                   )}
                 </div>
+
+                {(userRole === "admin" || userRole === "ingeniero") && (
+                  <div>
+                    <Label htmlFor="path-file-reporte">Path file reporte</Label>
+                    <Input
+                      id="path-file-reporte"
+                      placeholder="Ingrese la ruta del archivo de reporte previo al diagnóstico"
+                      value={pathFileReporte}
+                      onChange={(e) => setPathFileReporte(e.target.value)}
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Adjunte el path del último record previo al diagnóstico para futuras referencias
+                    </p>
+                  </div>
+                )}
 
                 {canResolveTicket && (
                   <Button
@@ -437,8 +423,10 @@ Soporte de: ${supportedBy}`
                 <div className="border-t pt-4">
                   <h4 className="font-medium mb-2">Proceso de Resolución</h4>
                   <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
-                    <li>Describa cómo se resolvió el problema en detalle</li>
-                    <li>Indique si recibió ayuda de otro ingeniero (opcional)</li>
+                    <li>Primero seleccione la fixtura a la cual se le brindó el soporte</li>
+                    <li>Después ingrese el diagnóstico del que partió para poder resolver el problema</li>
+                    <li>Describa cómo fue que le dio solución a dicho problema</li>
+                    <li>Por último adjunte el path del último record previo al diagnóstico para en un futuro poder mediar y distinguir problemas del mismo tipo de manera más sistemática</li>
                     <li>Marque el ticket como resuelto</li>
                     <li>El usuario que creó el ticket deberá confirmar la resolución</li>
                     <li>Si el usuario confirma, el ticket se cerrará</li>

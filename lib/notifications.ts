@@ -17,12 +17,10 @@ export async function notifyTestEngineers(ticket: Partial<Ticket>): Promise<bool
     const testEngineers = allUsers.filter((user) => user.role === "engineer" && user.area === "Test Engineering")
 
     if (testEngineers.length === 0) {
-      console.log("No test engineers found to notify")
       return false
     }
 
     // Log the notification (in a real app, this would send actual emails)
-    console.log(`Sending email notifications to ${testEngineers.length} test engineers about ticket ${ticket.fixtura}`)
 
     // For each engineer, send an email
     for (const engineer of testEngineers) {
@@ -47,9 +45,6 @@ async function sendEmail({ to, subject, body }: { to: string; subject: string; b
   // await sendgrid.send({ to, from: 'tickets@milwaukeeelectronics.com', subject, html: body })
 
   // For now, we'll just log the email details
-  console.log(`Email would be sent to: ${to}`)
-  console.log(`Subject: ${subject}`)
-  console.log(`Body: ${body}`)
 
   // Simulate a delay for sending the email
   await new Promise((resolve) => setTimeout(resolve, 100))

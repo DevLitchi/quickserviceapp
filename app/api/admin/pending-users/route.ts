@@ -15,7 +15,6 @@ export async function GET(request: Request) {
     // Get all pending users
     const pendingUsers = await usersCollection.find({ status: "pending" }).toArray()
 
-    console.log(`Found ${pendingUsers.length} pending users`)
 
     return NextResponse.json({
       success: true,

@@ -50,8 +50,6 @@ export default function EngineerTicketList() {
       const data = await response.json()
 
       // Add this to the fetchTickets function after the API call
-      console.log("API Response:", data)
-      console.log("Tickets received:", data.tickets ? data.tickets.length : 0)
 
       if (data.tickets) {
         setTickets(data.tickets)
@@ -90,7 +88,6 @@ export default function EngineerTicketList() {
         const role = await getUserRole()
         const user = await getCurrentUser()
 
-        console.log("User role:", role, "User:", user)
         setUserRole(role)
         setCurrentUser(user)
 
@@ -111,7 +108,6 @@ export default function EngineerTicketList() {
       return
     }
 
-    console.log("Applying filters - tickets:", tickets.length, "filter:", filter, "priority:", priorityFilter)
 
     let result = [...tickets]
 
@@ -132,7 +128,6 @@ export default function EngineerTicketList() {
       result = result.filter((ticket) => ticket.prioridad === priorityFilter)
     }
 
-    console.log("Filtered tickets:", result.length)
     setFilteredTickets(result)
     // Reset to first page when filters change
     setCurrentPage(1)
@@ -143,7 +138,7 @@ export default function EngineerTicketList() {
     setIsModalOpen(true)
   }
 
-  const handleAssignToMe = async (ticketId: string, e: React.MouseEvent) => {
+  const handleAssignToMe = async (ticketId: number, e: React.MouseEvent) => {
     e.stopPropagation() // Evitar que se abra el modal
 
     if (!currentUser?.name || !currentUser?.email) {
@@ -155,10 +150,10 @@ export default function EngineerTicketList() {
     }
 
     setIsAssigning(true)
-    setAssigningTicketId(ticketId)
+            setAssigningTicketId(ticketId.toString())
 
     try {
-      const response = await fetch(`/api/tickets/${ticketId}`, {
+      const response = await fetch(`/api/tickets/${ticketId.toString()}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -215,7 +210,7 @@ export default function EngineerTicketList() {
     if (!commentText.trim()) return
 
     try {
-      const response = await fetch(`/api/tickets/${ticketId}`, {
+      const response = await fetch(`/api/tickets/${ticketId.toString()}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -234,7 +229,7 @@ export default function EngineerTicketList() {
 
       if (data.success) {
         // Obtener el ticket actualizado
-        const ticketResponse = await fetch(`/api/tickets/${ticketId}`)
+        const ticketResponse = await fetch(`/api/tickets/${ticketId.toString()}`)
         const ticketData = await ticketResponse.json()
 
         if (ticketData.ticket) {
@@ -270,9 +265,9 @@ export default function EngineerTicketList() {
     }
   }
 
-  const handleMarkAsResolved = async (ticketId: number, resolutionDetails: string, supportedBy?: string) => {
+  const handleMarkAsResolved = async (ticketId: number, resolutionDetails: string) => {
     try {
-      const response = await fetch(`/api/tickets/${ticketId}`, {
+      const response = await fetch(`/api/tickets/${ticketId.toString()}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -280,7 +275,6 @@ export default function EngineerTicketList() {
         body: JSON.stringify({
           action: "resolve",
           resolutionDetails,
-          supportedBy,
         }),
       })
 
@@ -292,7 +286,7 @@ export default function EngineerTicketList() {
 
       if (data.success) {
         // Obtener el ticket actualizado
-        const ticketResponse = await fetch(`/api/tickets/${ticketId}`)
+        const ticketResponse = await fetch(`/api/tickets/${ticketId.toString()}`)
         const ticketData = await ticketResponse.json()
 
         if (ticketData.ticket) {
@@ -348,6 +342,48 @@ export default function EngineerTicketList() {
       return <Badge className="bg-green-100 text-green-800">Resuelto</Badge>
     } else {
       return <Badge className="bg-blue-100 text-blue-800">Abierto</Badge>
+    }
+  }
+
+  // Function to calculate urgency level and get appropriate styling for unassigned tickets
+  const getUnassignedTicketUrgency = (ticket: Ticket) => {
+    if (ticket.assignedTo) return null // Only for unassigned tickets
+
+    const now = new Date()
+    const ticketDate = new Date(ticket.fecha_creacion)
+    const hoursSinceCreation = (now.getTime() - ticketDate.getTime()) / (1000 * 60 * 60)
+
+    // Define time thresholds
+    const lowUrgency = 0.5 // 0.5 hours - orange
+    const highUrgency = 1 // 1 hour - red
+
+    if (hoursSinceCreation < lowUrgency) {
+      return {
+        level: 'pending',
+        hours: Math.round(hoursSinceCreation * 10) / 10,
+        className: 'border-2 border-yellow-300 bg-gradient-to-r from-yellow-50 to-yellow-100 shadow-yellow-100',
+        urgencyText: 'Pendiente',
+        textColor: 'text-yellow-800',
+        badgeColor: 'bg-yellow-200 text-yellow-900 border-yellow-300'
+      }
+    } else if (hoursSinceCreation < highUrgency) {
+      return {
+        level: 'warning',
+        hours: Math.round(hoursSinceCreation * 10) / 10,
+        className: 'border-2 border-orange-300 bg-gradient-to-r from-orange-50 to-orange-100 shadow-orange-100',
+        urgencyText: 'Atención requerida',
+        textColor: 'text-orange-800',
+        badgeColor: 'bg-orange-200 text-orange-900 border-orange-300'
+      }
+    } else {
+      return {
+        level: 'emergency',
+        hours: Math.round(hoursSinceCreation * 10) / 10,
+        className: 'border-2 border-red-300 bg-gradient-to-r from-red-50 to-red-100 shadow-red-100',
+        urgencyText: 'EMERGENCIA',
+        textColor: 'text-red-800',
+        badgeColor: 'bg-red-200 text-red-900 border-red-300'
+      }
     }
   }
 
@@ -427,29 +463,41 @@ export default function EngineerTicketList() {
             </div>
           ) : currentTickets.length > 0 ? (
             <div className="space-y-4">
-              {currentTickets.map((ticket) => (
+              {currentTickets.map((ticket) => {
+                const urgency = getUnassignedTicketUrgency(ticket)
+                return (
                 <div
                   key={ticket.id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors relative"
+                  className={`p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors relative ${
+                    urgency ? urgency.className : ''
+                  }`}
                   onClick={() => handleTicketClick(ticket)}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h3 className="font-medium">{ticket.fixtura}</h3>
-                      <p className="text-sm text-gray-500">
+                      <h3 className={`font-medium ${urgency ? urgency.textColor : 'text-gray-900'}`}>{ticket.fixtura}</h3>
+                      <p className={`text-sm ${urgency ? urgency.textColor.replace('800', '600') : 'text-gray-500'}`}>
                         {ticket.supervisor} - {ticket.tipo}
                         {ticket.tipo === "Other" && `: ${ticket.otherDescription}`}
                       </p>
                     </div>
                     <div className="flex flex-col gap-1 items-end">
-                      {getStatusBadge(ticket)}
-                      <Badge className={getPriorityColor(ticket.prioridad)}>{ticket.prioridad}</Badge>
+                      {urgency ? (
+                        <Badge className={urgency.badgeColor}>{urgency.urgencyText}</Badge>
+                      ) : (
+                        getStatusBadge(ticket)
+                      )}
+                      <Badge className={urgency ? urgency.badgeColor : getPriorityColor(ticket.prioridad)}>
+                        {ticket.prioridad}
+                      </Badge>
                     </div>
                   </div>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs text-gray-500">{ticket.fecha_creacion}</span>
+                    <span className={`text-xs ${urgency ? urgency.textColor.replace('800', '600') : 'text-gray-500'}`}>
+                      {ticket.fecha_creacion}
+                    </span>
                     {ticket.assignedTo ? (
-                      <span className="text-sm font-medium">
+                      <span className={`text-sm font-medium ${urgency ? urgency.textColor : 'text-gray-900'}`}>
                         {ticket.assignedToEmail === currentUser?.email ? "Asignado a mí" : ticket.assignedTo}
                       </span>
                     ) : (
@@ -457,9 +505,10 @@ export default function EngineerTicketList() {
                         size="sm"
                         variant="outline"
                         onClick={(e) => handleAssignToMe(ticket.id, e)}
-                        disabled={isAssigning && assigningTicketId === ticket.id}
+                        disabled={isAssigning && assigningTicketId === ticket.id.toString()}
+                        className={urgency ? `border-${urgency.level === 'pending' ? 'yellow' : urgency.level === 'warning' ? 'orange' : 'red'}-300 text-${urgency.level === 'pending' ? 'yellow' : urgency.level === 'warning' ? 'orange' : 'red'}-700 hover:bg-${urgency.level === 'pending' ? 'yellow' : urgency.level === 'warning' ? 'orange' : 'red'}-50` : ''}
                       >
-                        {isAssigning && assigningTicketId === ticket.id ? (
+                        {isAssigning && assigningTicketId === ticket.id.toString() ? (
                           <>
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             Asignando...
@@ -475,8 +524,21 @@ export default function EngineerTicketList() {
                       Esperando confirmación del usuario
                     </div>
                   )}
+                  
+                  {/* Urgency indicator for unassigned tickets */}
+                  {urgency && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className={`text-xs px-2 py-1 rounded-full font-medium border ${urgency.badgeColor}`}>
+                        {urgency.urgencyText}
+                      </div>
+                      <div className={`text-xs ${urgency.textColor.replace('800', '600')}`}>
+                        {urgency.hours}h sin atención
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
+                )
+              })}
 
               {/* Pagination controls */}
               {totalPages > 1 && (

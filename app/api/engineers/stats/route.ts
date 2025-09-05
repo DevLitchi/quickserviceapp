@@ -84,9 +84,6 @@ export async function GET(request: Request) {
         },
       )
 
-      console.log(
-        `Experiencia actualizada para ${email}: ${totalExp} EXP (${solved} tickets resueltos, ${approvedUnregisteredSupport} unregistered support entries)`,
-      )
     }
 
     return NextResponse.json({

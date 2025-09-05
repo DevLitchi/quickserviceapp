@@ -36,7 +36,6 @@ export async function GET(request: Request) {
       // Actualizar el nivel si es necesario
       if (level !== user.level) {
         await usersCollection.updateOne({ email }, { $set: { level } })
-        console.log(`Nivel actualizado para ${email}: ${level} (desde ${user.level || "sin nivel"})`)
       }
     }
 

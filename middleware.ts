@@ -43,6 +43,8 @@ export function middleware(request: NextRequest) {
     "/user/extra-time/requests",
     "/user/changelog",
     "/engineer/changelog",
+    "/manager",
+    "/manager/settings",
   ]
 
   // Block access to removed routes
@@ -50,8 +52,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url))
   }
 
-  // Special handling for changelog - only engineers and admin/manager roles can access
-  if (path === "/dashboard/changelog" && userRole !== "ingeniero" && userRole !== "admin" && userRole !== "gerente") {
+  // Special handling for changelog - only engineers and admin roles can access
+  if (path === "/dashboard/changelog" && userRole !== "ingeniero" && userRole !== "admin") {
     return NextResponse.redirect(new URL("/restricted", request.url))
   }
 
@@ -71,7 +73,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/admin", request.url))
     } else if (userRole === "ingeniero") {
       return NextResponse.redirect(new URL("/engineer", request.url))
-    } else if (userRole === "supervisor" || userRole === "gerente") {
+    } else if (userRole === "supervisor") {
       return NextResponse.redirect(new URL("/user", request.url))
     } else {
       // Por defecto, redirigir a la página de usuario
@@ -104,9 +106,9 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/engineer", request.url))
     }
 
-    // Usuarios regulares (supervisores y gerentes) pueden acceder a rutas de usuario
+    // Usuarios regulares (supervisores) pueden acceder a rutas de usuario
     if (
-      (userRole === "supervisor" || userRole === "gerente") &&
+      userRole === "supervisor" &&
       !userRoutes.some((route) => path === route || path.startsWith(route))
     ) {
       return NextResponse.redirect(new URL("/user", request.url))

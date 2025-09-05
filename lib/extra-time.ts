@@ -31,12 +31,6 @@ export async function submitExtraTimeRequest(
       throw new Error("Usuario no autenticado")
     }
 
-    console.log("Guardando solicitud de tiempo extra:", {
-      ...request,
-      status: "pending",
-      createdAt: new Date(),
-      createdBy: userEmail,
-    })
 
     const result = await extraTimeCollection.insertOne({
       ...request,

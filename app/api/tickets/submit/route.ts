@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   try {
     const ticketData = await request.json()
 
-    console.log("Recibiendo datos de ticket:", ticketData)
 
     // Validar que el área sea válida
     const validAreas = ["ACG", "GRIDCONNECT", "GEOFORCE", "EMS", "SMT", "TELEMATICS"]

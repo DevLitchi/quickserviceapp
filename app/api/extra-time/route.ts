@@ -30,7 +30,6 @@ export async function POST(request: Request) {
   try {
     const requestData = await request.json()
 
-    console.log("Recibiendo solicitud de tiempo extra:", requestData)
 
     // Asegurarse de que tenemos los campos de hora
     if (!requestData.startTime || !requestData.endTime) {

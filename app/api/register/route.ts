@@ -122,7 +122,6 @@ async function notifyAdminsAboutNewRegistration(userName: string, userEmail: str
     // 2. Send emails to each admin using an email service
 
     // For now, we'll just log the notification
-    console.log(`New registration: ${userName} (${userEmail}) is pending approval`)
 
     // This would be implemented with your email service
     // await sendEmail({

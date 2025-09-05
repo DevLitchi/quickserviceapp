@@ -8,11 +8,12 @@ import type { User } from "./types"
 
 // Add the missing getSession export
 export async function getSession() {
-  const userId = cookies().get("userId")?.value
-  const userRole = cookies().get("userRole")?.value
-  const userEmail = cookies().get("userEmail")?.value
-  const userName = cookies().get("userName")?.value
-  const userArea = cookies().get("userArea")?.value
+  const cookieStore = await cookies()
+  const userId = cookieStore.get("userId")?.value
+  const userRole = cookieStore.get("userRole")?.value
+  const userEmail = cookieStore.get("userEmail")?.value
+  const userName = cookieStore.get("userName")?.value
+  const userArea = cookieStore.get("userArea")?.value
 
   if (!userId || !userRole || !userEmail) {
     return null
@@ -35,7 +36,6 @@ export async function authenticate(email: string, password: string): Promise<boo
     const user = await usersCollection.findOne({ email })
 
     if (!user) {
-      console.log(`Authentication failed for ${email}`)
       return false
     }
 
@@ -52,49 +52,47 @@ export async function authenticate(email: string, password: string): Promise<boo
     }
 
     if (!isValidPassword) {
-      console.log(`Authentication failed (invalid password) for ${email}`)
       return false
     }
 
-    console.log(`Authentication successful for ${email}, role: ${user.role}`)
-
     // Establecer cookies con la información del usuario
-    cookies().set("auth", "true", {
+    const cookieStore = await cookies()
+    cookieStore.set("auth", "true", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 día
       path: "/",
     })
 
-    cookies().set("userId", String(user._id), {
+    cookieStore.set("userId", String(user._id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 día
       path: "/",
     })
 
-    cookies().set("userRole", user.role, {
+    cookieStore.set("userRole", user.role, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 día
       path: "/",
     })
 
-    cookies().set("userEmail", user.email, {
+    cookieStore.set("userEmail", user.email, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 día
       path: "/",
     })
 
-    cookies().set("userName", user.name, {
+    cookieStore.set("userName", user.name, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 día
       path: "/",
     })
 
-    cookies().set("userArea", user.area, {
+    cookieStore.set("userArea", user.area, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 día
@@ -109,19 +107,20 @@ export async function authenticate(email: string, password: string): Promise<boo
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const authCookie = cookies().get("auth")
+  const cookieStore = await cookies()
+  const authCookie = cookieStore.get("auth")
   return authCookie?.value === "true"
 }
 
 export async function getCurrentUser() {
-  const userId = cookies().get("userId")?.value
-  const userRole = cookies().get("userRole")?.value
-  const userEmail = cookies().get("userEmail")?.value
-  const userName = cookies().get("userName")?.value
-  const userArea = cookies().get("userArea")?.value
+  const cookieStore = await cookies()
+  const userId = cookieStore.get("userId")?.value
+  const userRole = cookieStore.get("userRole")?.value
+  const userEmail = cookieStore.get("userEmail")?.value
+  const userName = cookieStore.get("userName")?.value
+  const userArea = cookieStore.get("userArea")?.value
 
   if (!userId || !userRole || !userEmail) {
-    console.log("Missing user cookies")
     return null
   }
 
@@ -133,7 +132,6 @@ export async function getCurrentUser() {
       const user = await usersCollection.findOne({ _id: new ObjectId(userId) })
 
       if (user) {
-        console.log(`Found user in database: ${user.name}, role: ${user.role}`)
         return {
           id: user._id.toString(),
           role: user.role,
@@ -152,7 +150,6 @@ export async function getCurrentUser() {
   }
 
   // Si no se puede obtener de la base de datos, usar datos de cookies
-  console.log(`Using cookie data for user: ${userName}, role: ${userRole}`)
   return {
     id: userId,
     role: userRole,
@@ -163,34 +160,38 @@ export async function getCurrentUser() {
 }
 
 export async function getUserRole(): Promise<string | null> {
-  const roleCookie = cookies().get("userRole")
+  const cookieStore = await cookies()
+  const roleCookie = cookieStore.get("userRole")
   const role = roleCookie?.value || null
-  console.log("Current user role from cookie:", role)
   return role
 }
 
 export async function getUserArea(): Promise<string | null> {
-  const areaCookie = cookies().get("userArea")
+  const cookieStore = await cookies()
+  const areaCookie = cookieStore.get("userArea")
   return areaCookie?.value || null
 }
 
 export async function getUserEmail(): Promise<string | null> {
-  const emailCookie = cookies().get("userEmail")
+  const cookieStore = await cookies()
+  const emailCookie = cookieStore.get("userEmail")
   return emailCookie?.value || null
 }
 
 export async function getUserName(): Promise<string | null> {
-  const nameCookie = cookies().get("userName")
+  const cookieStore = await cookies()
+  const nameCookie = cookieStore.get("userName")
   return nameCookie?.value || null
 }
 
 export async function logout(): Promise<void> {
-  cookies().delete("auth")
-  cookies().delete("userId")
-  cookies().delete("userRole")
-  cookies().delete("userEmail")
-  cookies().delete("userName")
-  cookies().delete("userArea")
+  const cookieStore = await cookies()
+  cookieStore.delete("auth")
+  cookieStore.delete("userId")
+  cookieStore.delete("userRole")
+  cookieStore.delete("userEmail")
+  cookieStore.delete("userName")
+  cookieStore.delete("userArea")
 }
 
 // Función para obtener todos los usuarios (para administración de usuarios)

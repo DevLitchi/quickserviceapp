@@ -16,9 +16,9 @@ export default function ViewTicketsClient() {
       {showSuccess && (
         <Alert className="mb-6 bg-green-50 border-green-200">
           <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-800">Success!</AlertTitle>
+          <AlertTitle className="text-green-800">¡Éxito!</AlertTitle>
           <AlertDescription className="text-green-700">
-            Your ticket has been submitted successfully and all test engineers have been notified.
+            Tu ticket ha sido enviado exitosamente y todos los ingenieros de prueba han sido notificados.
           </AlertDescription>
         </Alert>
       )}

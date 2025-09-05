@@ -101,7 +101,6 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 async function notifyUserAboutApproval(userEmail: string, userName: string, role: string) {
   try {
     // In a real application, you would send an email to the user
-    console.log(`Account approved: ${userName} (${userEmail}) has been approved with role ${role}`)
 
     // This would be implemented with your email service
     // await sendEmail({
@@ -118,7 +117,6 @@ async function notifyUserAboutApproval(userEmail: string, userName: string, role
 async function notifyUserAboutRejection(userEmail: string, userName: string) {
   try {
     // In a real application, you would send an email to the user
-    console.log(`Account rejected: ${userName} (${userEmail}) registration has been rejected`)
 
     // This would be implemented with your email service
     // await sendEmail({

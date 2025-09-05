@@ -41,7 +41,6 @@ export default function PendingRegistrations() {
       }
 
       const data = await response.json()
-      console.log("Pending users data:", data)
 
       if (data.success) {
         setPendingUsers(data.users || [])
